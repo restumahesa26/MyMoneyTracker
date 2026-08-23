@@ -18,6 +18,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 interface NavbarProps {
   onOpenTransactionModal: (type?: "INCOME" | "EXPENSE") => void;
@@ -126,20 +127,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+              className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
             >
-              {user?.photoURL ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || "User"}
-                  className="w-8 h-8 rounded-lg object-cover ring-2 ring-indigo-500/30"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs uppercase shadow-sm">
-                  {user?.displayName ? user.displayName.charAt(0) : <UserIcon className="w-4 h-4" />}
-                </div>
-              )}
+              <UserAvatar
+                photoURL={user?.photoURL}
+                name={user?.displayName || user?.email}
+                size="sm"
+              />
               <span className="hidden md:inline text-xs font-semibold text-slate-700 dark:text-slate-200 max-w-[120px] truncate">
                 {user?.displayName || (isDemo ? "Guest Demo" : "Pengguna")}
               </span>
@@ -167,6 +161,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
 
                   <div className="py-1">
+                    {isDemo && (
+                      <Link
+                        href="/login"
+                        onClick={() => setShowProfileMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/60"
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        Login / Sync Firebase
+                      </Link>
+                    )}
                     <Link
                       href="/settings"
                       onClick={() => setShowProfileMenu(false)}

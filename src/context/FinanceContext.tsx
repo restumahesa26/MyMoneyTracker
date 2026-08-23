@@ -25,7 +25,7 @@ import {
 import { DEFAULT_CATEGORIES } from "@/lib/constants";
 import dummyData from "@/data/dummyData.json";
 import { getDateFilterRange } from "@/lib/formatters";
-import { generateId } from "@/lib/utils";
+import { generateId, cleanForFirestore } from "@/lib/utils";
 import {
   parseISO,
   isWithinInterval,
@@ -34,6 +34,7 @@ import {
   differenceInDays,
   subDays,
 } from "date-fns";
+import { toast } from "sonner";
 
 interface FinanceContextType {
   accounts: Account[];
@@ -117,28 +118,50 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const userId = user.uid;
         const firestore = db as Firestore;
 
-        // Listen to Real Accounts (Starts empty if user hasn't added any)
+        // Listen to Real Accounts
         const accountsRef = collection(firestore, "users", userId, "accounts");
-        const unSubAccounts = onSnapshot(accountsRef, (snapshot) => {
-          const accs = snapshot.docs.map((d) => d.data() as Account);
-          setAccounts(accs);
-        });
+        const unSubAccounts = onSnapshot(
+          accountsRef,
+          (snapshot) => {
+            const accs = snapshot.docs.map((d) => d.data() as Account);
+            setAccounts(accs);
+          },
+          (error) => {
+            console.error("Firestore accounts listener error:", error);
+            toast.error(
+              "Gagal membaca dompet dari Firestore. Pastikan Firestore Security Rules di Firebase Console mengizinkan akses read/write."
+            );
+          }
+        );
 
         // Listen to Real Categories
         const categoriesRef = collection(firestore, "users", userId, "categories");
-        const unSubCategories = onSnapshot(categoriesRef, (snapshot) => {
-          const cats = snapshot.docs.map((d) => d.data() as Category);
-          setCategories(cats);
-        });
+        const unSubCategories = onSnapshot(
+          categoriesRef,
+          (snapshot) => {
+            const cats = snapshot.docs.map((d) => d.data() as Category);
+            setCategories(cats);
+          },
+          (error) => {
+            console.error("Firestore categories listener error:", error);
+          }
+        );
 
         // Listen to Real Transactions
         const transactionsRef = collection(firestore, "users", userId, "transactions");
         const q = query(transactionsRef, orderBy("date", "desc"));
-        const unSubTransactions = onSnapshot(q, (snapshot) => {
-          const txs = snapshot.docs.map((d) => d.data() as Transaction);
-          setTransactions(txs);
-          setLoading(false);
-        });
+        const unSubTransactions = onSnapshot(
+          q,
+          (snapshot) => {
+            const txs = snapshot.docs.map((d) => d.data() as Transaction);
+            setTransactions(txs);
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Firestore transactions listener error:", error);
+            setLoading(false);
+          }
+        );
 
         return () => {
           unSubAccounts();
@@ -146,8 +169,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           unSubTransactions();
         };
       } else {
-        // In Real Firebase mode, but user is in demo auth or offline without Firebase credentials
-        // Use empty real state stored under local real storage
+        // Real Data Mode but in Demo or offline
         try {
           setLoading(true);
           const realStorageKey = `mmt_real_local_${user?.uid || "custom"}`;
@@ -182,7 +204,6 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setCategories(parsed.categories || (dummyData.categories as Category[]));
           setTransactions(parsed.transactions || (dummyData.transactions as Transaction[]));
         } else {
-          // Initialize from dummyData.json
           const initialAcc = dummyData.accounts as Account[];
           const initialCat = dummyData.categories as Category[];
           const initialTx = dummyData.transactions as Transaction[];
@@ -230,12 +251,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Helper to load default category templates into Real Data if user wants templates
   const loadDefaultCategoriesToReal = async () => {
     const isOnlineFirestore =
-      dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user;
+      dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && Boolean(db) && Boolean(user);
 
-    if (isOnlineFirestore) {
+    if (isOnlineFirestore && db && user) {
       const firestore = db as Firestore;
       for (const cat of DEFAULT_CATEGORIES) {
-        await setDoc(doc(firestore, "users", user.uid, "categories", cat.id), cat);
+        await setDoc(doc(firestore, "users", user.uid, "categories", cat.id), cleanForFirestore(cat));
       }
     } else {
       setCategories(DEFAULT_CATEGORIES);
@@ -362,12 +383,18 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const updatedTransactions = [newTx, ...transactions];
 
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await setDoc(doc(firestore, "users", user.uid, "transactions", newId), newTx);
-      for (const acc of updatedAccounts) {
-        await updateDoc(doc(firestore, "users", user.uid, "accounts", acc.id), {
-          balance: acc.balance,
-        });
+      try {
+        const firestore = db as Firestore;
+        await setDoc(doc(firestore, "users", user.uid, "transactions", newId), cleanForFirestore(newTx));
+        for (const acc of updatedAccounts) {
+          await updateDoc(doc(firestore, "users", user.uid, "accounts", acc.id), {
+            balance: acc.balance,
+          });
+        }
+      } catch (err: any) {
+        console.error("Firestore transaction write error:", err);
+        toast.error("Gagal sinkronisasi ke Firestore: " + err.message);
+        throw err;
       }
     } else {
       setAccounts(updatedAccounts);
@@ -428,15 +455,21 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const updatedTransactions = transactions.map((t) => (t.id === id ? mergedTx : t));
 
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await updateDoc(
-        doc(firestore, "users", user.uid, "transactions", id),
-        { ...mergedTx } as Record<string, any>
-      );
-      for (const acc of updatedAccounts) {
-        await updateDoc(doc(firestore, "users", user.uid, "accounts", acc.id), {
-          balance: acc.balance,
-        });
+      try {
+        const firestore = db as Firestore;
+        await updateDoc(
+          doc(firestore, "users", user.uid, "transactions", id),
+          cleanForFirestore({ ...mergedTx }) as Record<string, any>
+        );
+        for (const acc of updatedAccounts) {
+          await updateDoc(doc(firestore, "users", user.uid, "accounts", acc.id), {
+            balance: acc.balance,
+          });
+        }
+      } catch (err: any) {
+        console.error("Firestore update error:", err);
+        toast.error("Gagal memperbarui di Firestore: " + err.message);
+        throw err;
       }
     } else {
       setAccounts(updatedAccounts);
@@ -471,12 +504,18 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const updatedTransactions = transactions.filter((t) => t.id !== id);
 
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await deleteDoc(doc(firestore, "users", user.uid, "transactions", id));
-      for (const acc of updatedAccounts) {
-        await updateDoc(doc(firestore, "users", user.uid, "accounts", acc.id), {
-          balance: acc.balance,
-        });
+      try {
+        const firestore = db as Firestore;
+        await deleteDoc(doc(firestore, "users", user.uid, "transactions", id));
+        for (const acc of updatedAccounts) {
+          await updateDoc(doc(firestore, "users", user.uid, "accounts", acc.id), {
+            balance: acc.balance,
+          });
+        }
+      } catch (err: any) {
+        console.error("Firestore delete error:", err);
+        toast.error("Gagal menghapus dari Firestore: " + err.message);
+        throw err;
       }
     } else {
       setAccounts(updatedAccounts);
@@ -525,8 +564,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     const updated = [...accounts, newAcc];
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await setDoc(doc(firestore, "users", user.uid, "accounts", newId), newAcc);
+      try {
+        const firestore = db as Firestore;
+        await setDoc(doc(firestore, "users", user.uid, "accounts", newId), cleanForFirestore(newAcc));
+      } catch (err: any) {
+        console.error("Firestore addAccount error:", err);
+        toast.error("Gagal menyimpan dompet ke Cloud Firestore: " + err.message);
+        throw err;
+      }
     } else {
       setAccounts(updated);
       persistLocal(updated, categories, transactions);
@@ -536,11 +581,17 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateAccount = async (id: string, data: Partial<Account>) => {
     const updated = accounts.map((a) => (a.id === id ? { ...a, ...data } : a));
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await updateDoc(
-        doc(firestore, "users", user.uid, "accounts", id),
-        data as Record<string, any>
-      );
+      try {
+        const firestore = db as Firestore;
+        await updateDoc(
+          doc(firestore, "users", user.uid, "accounts", id),
+          cleanForFirestore(data) as Record<string, any>
+        );
+      } catch (err: any) {
+        console.error("Firestore updateAccount error:", err);
+        toast.error("Gagal update dompet di Firestore: " + err.message);
+        throw err;
+      }
     } else {
       setAccounts(updated);
       persistLocal(updated, categories, transactions);
@@ -550,8 +601,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const deleteAccount = async (id: string) => {
     const updated = accounts.filter((a) => a.id !== id);
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await deleteDoc(doc(firestore, "users", user.uid, "accounts", id));
+      try {
+        const firestore = db as Firestore;
+        await deleteDoc(doc(firestore, "users", user.uid, "accounts", id));
+      } catch (err: any) {
+        console.error("Firestore deleteAccount error:", err);
+        toast.error("Gagal menghapus dompet dari Firestore: " + err.message);
+        throw err;
+      }
     } else {
       setAccounts(updated);
       persistLocal(updated, categories, transactions);
@@ -568,8 +625,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     const updated = [...categories, newCat];
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await setDoc(doc(firestore, "users", user.uid, "categories", newId), newCat);
+      try {
+        const firestore = db as Firestore;
+        await setDoc(doc(firestore, "users", user.uid, "categories", newId), cleanForFirestore(newCat));
+      } catch (err: any) {
+        console.error("Firestore addCategory error:", err);
+        toast.error("Gagal menyimpan kategori ke Firestore: " + err.message);
+        throw err;
+      }
     } else {
       setCategories(updated);
       persistLocal(accounts, updated, transactions);
@@ -579,11 +642,17 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateCategory = async (id: string, data: Partial<Category>) => {
     const updated = categories.map((c) => (c.id === id ? { ...c, ...data } : c));
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await updateDoc(
-        doc(firestore, "users", user.uid, "categories", id),
-        data as Record<string, any>
-      );
+      try {
+        const firestore = db as Firestore;
+        await updateDoc(
+          doc(firestore, "users", user.uid, "categories", id),
+          cleanForFirestore(data) as Record<string, any>
+        );
+      } catch (err: any) {
+        console.error("Firestore updateCategory error:", err);
+        toast.error("Gagal update kategori di Firestore: " + err.message);
+        throw err;
+      }
     } else {
       setCategories(updated);
       persistLocal(accounts, updated, transactions);
@@ -593,8 +662,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const deleteCategory = async (id: string) => {
     const updated = categories.filter((c) => c.id !== id);
     if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
-      const firestore = db as Firestore;
-      await deleteDoc(doc(firestore, "users", user.uid, "categories", id));
+      try {
+        const firestore = db as Firestore;
+        await deleteDoc(doc(firestore, "users", user.uid, "categories", id));
+      } catch (err: any) {
+        console.error("Firestore deleteCategory error:", err);
+        toast.error("Gagal hapus kategori di Firestore: " + err.message);
+        throw err;
+      }
     } else {
       setCategories(updated);
       persistLocal(accounts, updated, transactions);

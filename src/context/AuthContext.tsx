@@ -22,6 +22,7 @@ interface AuthContextType {
   registerWithEmail: (email: string, pass: string, name: string) => Promise<void>;
   loginAsGuest: () => void;
   logout: () => Promise<void>;
+  updateUserProfileData: (displayName: string, photoURL?: string | null) => Promise<void>;
 }
 
 const DEMO_USER: UserProfile = {
@@ -43,6 +44,7 @@ const AuthContext = createContext<AuthContextType>({
   registerWithEmail: async () => {},
   loginAsGuest: () => {},
   logout: async () => {},
+  updateUserProfileData: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -181,6 +183,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsDemo(false);
   };
 
+  const updateUserProfileData = async (displayName: string, photoURL?: string | null) => {
+    if (auth?.currentUser) {
+      await updateProfile(auth.currentUser, {
+        displayName: displayName || undefined,
+        photoURL: photoURL ?? undefined,
+      });
+    }
+    setUser((prev) =>
+      prev
+        ? {
+            ...prev,
+            displayName,
+            photoURL: photoURL ?? null,
+          }
+        : null
+    );
+    if (isDemo && typeof window !== "undefined") {
+      const demoData = {
+        ...DEMO_USER,
+        displayName,
+        photoURL: photoURL ?? null,
+      };
+      localStorage.setItem("mmt_demo_user", JSON.stringify(demoData));
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -192,6 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         registerWithEmail,
         loginAsGuest,
         logout,
+        updateUserProfileData,
       }}
     >
       {children}

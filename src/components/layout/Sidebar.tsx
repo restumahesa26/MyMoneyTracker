@@ -20,6 +20,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 export const NAV_ITEMS = [
   {
@@ -134,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {renderNavLinks()}
 
         {/* Pro Banner / Tips Widget */}
-        <div className="mt-auto pt-6">
+        <div className="mt-auto pt-6 space-y-4">
           <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-900/10 via-purple-900/5 to-emerald-900/10 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-emerald-950/30 border border-indigo-200/50 dark:border-indigo-800/40">
             <div className="flex items-center gap-2 mb-1.5 text-indigo-600 dark:text-indigo-400">
               <Sparkles className="w-4 h-4" />
@@ -143,6 +144,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
               Gunakan metode 50/30/20: 50% Kebutuhan, 30% Keinginan, dan 20% Tabungan/Investasi.
             </p>
+          </div>
+
+          {/* Desktop Sidebar User Profile Card */}
+          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <UserAvatar photoURL={user?.photoURL} name={user?.displayName || user?.email} size="md" />
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                  {user?.displayName || "Pengguna"}
+                </p>
+                <p className="text-[10px] text-slate-400 truncate">
+                  {user?.email || "demo@moneytracker.id"}
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/settings"
+              title="Pengaturan"
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </aside>
@@ -243,9 +267,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Bottom Drawer info & Logout */}
             <div className="pt-4 mt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <div className="truncate">
-                  <p className="font-bold text-slate-800 dark:text-slate-100 truncate">
+              <div className="flex items-center gap-3">
+                <UserAvatar photoURL={user?.photoURL} name={user?.displayName || user?.email} size="md" />
+                <div className="min-w-0 flex-1 truncate">
+                  <p className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">
                     {user?.displayName || "Pengguna"}
                   </p>
                   <p className="text-[11px] text-slate-400 truncate">

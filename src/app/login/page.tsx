@@ -54,7 +54,17 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message || "Gagal melakukan autentikasi");
+      if (err.code === "auth/operation-not-allowed" || err.code === "auth/configuration-not-found") {
+        toast.error("Provider Email/Password belum diaktifkan di Firebase Console > Authentication > Sign-in method.");
+      } else if (err.code === "auth/email-already-in-use") {
+        toast.error("Email ini sudah terdaftar. Silakan pilih tab 'Masuk (Login)'.");
+      } else if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password" || err.code === "auth/user-not-found") {
+        toast.error("Email atau kata sandi yang Anda masukkan salah.");
+      } else if (err.code === "auth/weak-password") {
+        toast.error("Kata sandi terlalu lemah (minimal 6 karakter).");
+      } else {
+        toast.error(err.message || "Gagal melakukan autentikasi");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -68,7 +78,13 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      toast.error("Gagal masuk dengan Google");
+      if (err.code === "auth/configuration-not-found" || err.code === "auth/operation-not-allowed") {
+        toast.error("Provider Google belum diaktifkan di Firebase Console > Authentication > Sign-in method.");
+      } else if (err.code === "auth/popup-closed-by-user") {
+        toast.info("Proses login Google dibatalkan.");
+      } else {
+        toast.error(err.message || "Gagal masuk dengan Google");
+      }
     } finally {
       setIsSubmitting(false);
     }

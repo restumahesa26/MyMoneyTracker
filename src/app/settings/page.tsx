@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useFinance } from "@/context/FinanceContext";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { DataSourceMode } from "@/types";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import {
   Settings,
   Moon,
@@ -23,12 +24,15 @@ import {
   CheckCircle2,
   Cloud,
   FileCode2,
+  User as UserIcon,
+  Camera,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
-  const { user, isDemo, logout } = useAuth();
+  const { user, isDemo, logout, updateUserProfileData } = useAuth();
   const {
     dataSource,
     setDataSource,
@@ -39,8 +43,33 @@ export default function SettingsPage() {
     importDataJSON,
   } = useFinance();
 
+  const [displayName, setDisplayName] = useState(user?.displayName || "");
+  const [customPhotoURL, setCustomPhotoURL] = useState(user?.photoURL || "");
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [importJsonText, setImportJsonText] = useState("");
   const [showImportBox, setShowImportBox] = useState(false);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!displayName.trim()) {
+      toast.error("Nama tampilan tidak boleh kosong");
+      return;
+    }
+    setIsSavingProfile(true);
+    try {
+      await updateUserProfileData(displayName.trim(), customPhotoURL.trim() || null);
+      toast.success("Profil & Foto Profil berhasil diperbarui!");
+    } catch (err: any) {
+      console.error("Save profile error:", err);
+      toast.error("Gagal memperbarui profil: " + (err.message || ""));
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleSelectAvatarPreset = (url: string) => {
+    setCustomPhotoURL(url);
+  };
 
   const handleDownloadJSON = () => {
     const json = exportDataJSON();
@@ -126,6 +155,141 @@ export default function SettingsPage() {
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
           Atur sumber data (Firebase vs Dummy JSON), tema tampilan, dan cadangan data keuangan
         </p>
+      </div>
+
+      {/* 0. USER PROFILE & AVATAR CUSTOMIZATION */}
+      <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-card space-y-5">
+        <div>
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <UserIcon className="w-4 h-4 text-indigo-500" />
+            <span>Profil Pengguna & Foto Profil</span>
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Foto profil diambil otomatis saat login dengan Google, atau Anda dapat mengganti nama & memilih avatar kustom di bawah
+          </p>
+        </div>
+
+        <form onSubmit={handleSaveProfile} className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-850/60 border border-slate-200/60 dark:border-slate-800">
+            <div className="relative group">
+              <UserAvatar photoURL={customPhotoURL || user?.photoURL} name={displayName || user?.email} size="xl" />
+              <div className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-indigo-600 text-white shadow-md">
+                <Camera className="w-3.5 h-3.5" />
+              </div>
+            </div>
+
+            <div className="space-y-1 min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                  {displayName || "Pengguna"}
+                </span>
+                {isDemo ? (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
+                    Mode Tamu
+                  </span>
+                ) : (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+                    Akun Google / Firebase
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-400 truncate">{user?.email || "demo@moneytracker.id"}</p>
+            </div>
+          </div>
+
+          {/* Form Fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Nama Tampilan
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Nama Anda..."
+                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                URL Foto Profil (Kustom / Google)
+              </label>
+              <input
+                type="url"
+                value={customPhotoURL}
+                onChange={(e) => setCustomPhotoURL(e.target.value)}
+                placeholder="https://lh3.googleusercontent.com/... atau URL foto"
+                className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+              />
+            </div>
+          </div>
+
+          {/* Quick Avatar Presets */}
+          <div>
+            <label className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
+              Pilihan Avatar Cepat:
+            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              {user?.photoURL && (
+                <button
+                  type="button"
+                  onClick={() => handleSelectAvatarPreset(user.photoURL!)}
+                  className={`p-1 rounded-xl border transition-all flex items-center gap-1.5 text-xs px-2.5 py-1 ${
+                    customPhotoURL === user.photoURL
+                      ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 font-bold"
+                      : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
+                  }`}
+                >
+                  <UserAvatar photoURL={user.photoURL} size="sm" />
+                  <span>Foto Google Asli</span>
+                </button>
+              )}
+
+              {[
+                { name: "Felix", url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" },
+                { name: "Aria", url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aria" },
+                { name: "Jack", url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" },
+                { name: "Luna", url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Luna" },
+                { name: "Cyber", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Lucky" },
+              ].map((preset) => (
+                <button
+                  key={preset.name}
+                  type="button"
+                  onClick={() => handleSelectAvatarPreset(preset.url)}
+                  className={`p-1 rounded-xl border transition-all flex items-center gap-1.5 text-xs px-2.5 py-1 ${
+                    customPhotoURL === preset.url
+                      ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 font-bold"
+                      : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
+                  }`}
+                >
+                  <UserAvatar photoURL={preset.url} size="sm" />
+                  <span>{preset.name}</span>
+                </button>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => setCustomPhotoURL("")}
+                className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 px-2 py-1"
+              >
+                Hapus Foto (Gunakan Inisial)
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isSavingProfile}
+              className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/25 transition-all hover:scale-102 active:scale-98 disabled:opacity-50 flex items-center gap-2"
+            >
+              <Check className="w-4 h-4" />
+              <span>{isSavingProfile ? "Menyimpan..." : "Simpan Perubahan Profil"}</span>
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* 1. DATA SOURCE SELECTION (NEW FEATURE) */}

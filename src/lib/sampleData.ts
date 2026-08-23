@@ -1,0 +1,171 @@
+import { Account, Category, Transaction } from "@/types";
+import { format, subDays } from "date-fns";
+
+export const generateSampleTransactions = (
+  accounts: Account[],
+  categories: Category[]
+): Transaction[] => {
+  const now = new Date();
+  const bca = accounts.find((a) => a.id === "acc_bca") || accounts[0];
+  const mandiri = accounts.find((a) => a.id === "acc_mandiri") || accounts[0];
+  const gopay = accounts.find((a) => a.id === "acc_gopay") || accounts[0];
+  const cash = accounts.find((a) => a.id === "acc_cash") || accounts[0];
+
+  const catSalary = categories.find((c) => c.name.includes("Gaji")) || categories[0];
+  const catFreelance = categories.find((c) => c.name.includes("Freelance")) || categories[0];
+  const catFood = categories.find((c) => c.name.includes("Makanan")) || categories[0];
+  const catTransport = categories.find((c) => c.name.includes("Transportasi")) || categories[0];
+  const catBills = categories.find((c) => c.name.includes("Tagihan")) || categories[0];
+  const catShopping = categories.find((c) => c.name.includes("Belanja")) || categories[0];
+  const catEntertainment = categories.find((c) => c.name.includes("Hiburan")) || categories[0];
+  const catSocial = categories.find((c) => c.name.includes("Sedekah")) || categories[0];
+
+  return [
+    {
+      id: "tx_1",
+      type: "INCOME",
+      amount: 15000000,
+      date: format(subDays(now, 2), "yyyy-MM-dd HH:mm"),
+      description: "Gaji Bulanan PT Maju Terus",
+      categoryId: catSalary.id,
+      categoryName: catSalary.name,
+      categoryIcon: catSalary.icon,
+      categoryColor: catSalary.color,
+      accountId: bca.id,
+      accountName: bca.name,
+      accountIcon: bca.icon,
+      tags: ["#gaji", "#kantor"],
+      createdAt: format(subDays(now, 2), "yyyy-MM-dd'T'HH:mm:ss"),
+    },
+    {
+      id: "tx_2",
+      type: "INCOME",
+      amount: 4500000,
+      date: format(subDays(now, 5), "yyyy-MM-dd HH:mm"),
+      description: "Side Project UI/UX Redesign Web",
+      categoryId: catFreelance.id,
+      categoryName: catFreelance.name,
+      categoryIcon: catFreelance.icon,
+      categoryColor: catFreelance.color,
+      accountId: mandiri.id,
+      accountName: mandiri.name,
+      accountIcon: mandiri.icon,
+      tags: ["#freelance", "#design"],
+      createdAt: format(subDays(now, 5), "yyyy-MM-dd'T'HH:mm:ss"),
+    },
+    {
+      id: "tx_3",
+      type: "EXPENSE",
+      amount: 1250000,
+      date: format(subDays(now, 1), "yyyy-MM-dd HH:mm"),
+      description: "Tagihan Listrik PLN & Indihome",
+      categoryId: catBills.id,
+      categoryName: catBills.name,
+      categoryIcon: catBills.icon,
+      categoryColor: catBills.color,
+      accountId: bca.id,
+      accountName: bca.name,
+      accountIcon: bca.icon,
+      tags: ["#rumah", "#utilitas"],
+      createdAt: format(subDays(now, 1), "yyyy-MM-dd'T'HH:mm:ss"),
+    },
+    {
+      id: "tx_4",
+      type: "EXPENSE",
+      amount: 350000,
+      date: format(now, "yyyy-MM-dd HH:mm"),
+      description: "Makan Siang & Kopi bareng Klien",
+      categoryId: catFood.id,
+      categoryName: catFood.name,
+      categoryIcon: catFood.icon,
+      categoryColor: catFood.color,
+      accountId: gopay.id,
+      accountName: gopay.name,
+      accountIcon: gopay.icon,
+      tags: ["#kuliner", "#kopi"],
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "tx_5",
+      type: "EXPENSE",
+      amount: 250000,
+      date: format(subDays(now, 3), "yyyy-MM-dd HH:mm"),
+      description: "Isi Bensin Pertamax Full Tank",
+      categoryId: catTransport.id,
+      categoryName: catTransport.name,
+      categoryIcon: catTransport.icon,
+      categoryColor: catTransport.color,
+      accountId: cash.id,
+      accountName: cash.name,
+      accountIcon: cash.icon,
+      tags: ["#kendaraan", "#bensin"],
+      createdAt: format(subDays(now, 3), "yyyy-MM-dd'T'HH:mm:ss"),
+    },
+    {
+      id: "tx_6",
+      type: "EXPENSE",
+      amount: 850000,
+      date: format(subDays(now, 4), "yyyy-MM-dd HH:mm"),
+      description: "Belanja Bulanan Supermarket",
+      categoryId: catShopping.id,
+      categoryName: catShopping.name,
+      categoryIcon: catShopping.icon,
+      categoryColor: catShopping.color,
+      accountId: bca.id,
+      accountName: bca.name,
+      accountIcon: bca.icon,
+      tags: ["#belanja", "#kebutuhan"],
+      createdAt: format(subDays(now, 4), "yyyy-MM-dd'T'HH:mm:ss"),
+    },
+    {
+      id: "tx_7",
+      type: "EXPENSE",
+      amount: 200000,
+      date: format(subDays(now, 6), "yyyy-MM-dd HH:mm"),
+      description: "Nonton Bioskop & Snack Weekend",
+      categoryId: catEntertainment.id,
+      categoryName: catEntertainment.name,
+      categoryIcon: catEntertainment.icon,
+      categoryColor: catEntertainment.color,
+      accountId: gopay.id,
+      accountName: gopay.name,
+      accountIcon: gopay.icon,
+      tags: ["#weekend", "#hiburan"],
+      createdAt: format(subDays(now, 6), "yyyy-MM-dd'T'HH:mm:ss"),
+    },
+    {
+      id: "tx_8",
+      type: "EXPENSE",
+      amount: 500000,
+      date: format(subDays(now, 7), "yyyy-MM-dd HH:mm"),
+      description: "Sedekah Jumat Berkah & Zakat",
+      categoryId: catSocial.id,
+      categoryName: catSocial.name,
+      categoryIcon: catSocial.icon,
+      categoryColor: catSocial.color,
+      accountId: bca.id,
+      accountName: bca.name,
+      accountIcon: bca.icon,
+      tags: ["#sedekah"],
+      createdAt: format(subDays(now, 7), "yyyy-MM-dd'T'HH:mm:ss"),
+    },
+    {
+      id: "tx_9",
+      type: "TRANSFER",
+      amount: 500000,
+      date: format(subDays(now, 2), "yyyy-MM-dd HH:mm"),
+      description: "Top-up saldo GoPay dari BCA",
+      categoryId: "cat_transfer",
+      categoryName: "Transfer Antar Dompet",
+      categoryIcon: "ArrowRightLeft",
+      categoryColor: "#6366F1",
+      accountId: bca.id,
+      accountName: bca.name,
+      accountIcon: bca.icon,
+      toAccountId: gopay.id,
+      toAccountName: gopay.name,
+      tags: ["#topup"],
+      createdAt: format(subDays(now, 2), "yyyy-MM-dd'T'HH:mm:ss"),
+    },
+  ];
+};

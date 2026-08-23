@@ -1,0 +1,321 @@
+{
+  "accounts": [
+    {
+      "id": "acc_bca",
+      "name": "Bank BCA",
+      "type": "BANK",
+      "balance": 14500000,
+      "icon": "Landmark",
+      "color": "#2563EB",
+      "accountNumber": "8830129841",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "acc_mandiri",
+      "name": "Bank Mandiri",
+      "type": "BANK",
+      "balance": 8250000,
+      "icon": "Building2",
+      "color": "#0284C7",
+      "accountNumber": "13700192847",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "acc_gopay",
+      "name": "GoPay",
+      "type": "E_WALLET",
+      "balance": 750000,
+      "icon": "Smartphone",
+      "color": "#059669",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "acc_ovo",
+      "name": "OVO",
+      "type": "E_WALLET",
+      "balance": 320000,
+      "icon": "Zap",
+      "color": "#7C3AED",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "acc_cash",
+      "name": "Uang Tunai (Dompet)",
+      "type": "CASH",
+      "balance": 650000,
+      "icon": "Wallet",
+      "color": "#D97706",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat_food",
+      "name": "Makanan & Minuman",
+      "type": "EXPENSE",
+      "icon": "Utensils",
+      "color": "#F43F5E",
+      "budgetLimit": 3000000,
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_transport",
+      "name": "Transportasi & Bensin",
+      "type": "EXPENSE",
+      "icon": "Car",
+      "color": "#F97316",
+      "budgetLimit": 1200000,
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_bills",
+      "name": "Tagihan & Utilitas (Listrik, Wifi)",
+      "type": "EXPENSE",
+      "icon": "Receipt",
+      "color": "#EAB308",
+      "budgetLimit": 1500000,
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_shopping",
+      "name": "Belanja & Kebutuhan",
+      "type": "EXPENSE",
+      "icon": "ShoppingBag",
+      "color": "#EC4899",
+      "budgetLimit": 2000000,
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_entertainment",
+      "name": "Hiburan & Rekreasi",
+      "type": "EXPENSE",
+      "icon": "Gamepad2",
+      "color": "#8B5CF6",
+      "budgetLimit": 1000000,
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_health",
+      "name": "Kesehatan & Medis",
+      "type": "EXPENSE",
+      "icon": "HeartPulse",
+      "color": "#06B6D4",
+      "budgetLimit": 800000,
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_social",
+      "name": "Sedekah & Donasi",
+      "type": "EXPENSE",
+      "icon": "HeartHandshake",
+      "color": "#10B981",
+      "budgetLimit": 1000000,
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_other_exp",
+      "name": "Pengeluaran Lainnya",
+      "type": "EXPENSE",
+      "icon": "CircleEllipsis",
+      "color": "#64748B",
+      "budgetLimit": 500000,
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_salary",
+      "name": "Gaji Utama",
+      "type": "INCOME",
+      "icon": "Briefcase",
+      "color": "#10B981",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_freelance",
+      "name": "Freelance & Side Project",
+      "type": "INCOME",
+      "icon": "Laptop",
+      "color": "#06B6D4",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_investment",
+      "name": "Investasi & Dividen",
+      "type": "INCOME",
+      "icon": "TrendingUp",
+      "color": "#6366F1",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_business",
+      "name": "Bisnis / Usaha",
+      "type": "INCOME",
+      "icon": "Store",
+      "color": "#F59E0B",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_gift",
+      "name": "Hadiah & Bonus",
+      "type": "INCOME",
+      "icon": "Gift",
+      "color": "#EC4899",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_other_inc",
+      "name": "Pemasukan Lainnya",
+      "type": "INCOME",
+      "icon": "PlusCircle",
+      "color": "#64748B",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_demo_1",
+      "type": "INCOME",
+      "amount": 15000000,
+      "date": "2026-08-20 09:00",
+      "description": "Gaji Bulanan PT Maju Terus",
+      "categoryId": "cat_salary",
+      "categoryName": "Gaji Utama",
+      "categoryIcon": "Briefcase",
+      "categoryColor": "#10B981",
+      "accountId": "acc_bca",
+      "accountName": "Bank BCA",
+      "accountIcon": "Landmark",
+      "tags": ["#gaji", "#kantor"],
+      "createdAt": "2026-08-20T09:00:00.000Z"
+    },
+    {
+      "id": "tx_demo_2",
+      "type": "INCOME",
+      "amount": 4500000,
+      "date": "2026-08-18 14:30",
+      "description": "Side Project UI/UX Redesign Web",
+      "categoryId": "cat_freelance",
+      "categoryName": "Freelance & Side Project",
+      "categoryIcon": "Laptop",
+      "categoryColor": "#06B6D4",
+      "accountId": "acc_mandiri",
+      "accountName": "Bank Mandiri",
+      "accountIcon": "Building2",
+      "tags": ["#freelance", "#design"],
+      "createdAt": "2026-08-18T14:30:00.000Z"
+    },
+    {
+      "id": "tx_demo_3",
+      "type": "EXPENSE",
+      "amount": 1250000,
+      "date": "2026-08-22 10:15",
+      "description": "Tagihan Listrik PLN & Indihome Fiber",
+      "categoryId": "cat_bills",
+      "categoryName": "Tagihan & Utilitas (Listrik, Wifi)",
+      "categoryIcon": "Receipt",
+      "categoryColor": "#EAB308",
+      "accountId": "acc_bca",
+      "accountName": "Bank BCA",
+      "accountIcon": "Landmark",
+      "tags": ["#rumah", "#utilitas"],
+      "createdAt": "2026-08-22T10:15:00.000Z"
+    },
+    {
+      "id": "tx_demo_4",
+      "type": "EXPENSE",
+      "amount": 350000,
+      "date": "2026-08-23 12:45",
+      "description": "Makan Siang & Kopi Spesial",
+      "categoryId": "cat_food",
+      "categoryName": "Makanan & Minuman",
+      "categoryIcon": "Utensils",
+      "categoryColor": "#F43F5E",
+      "accountId": "acc_gopay",
+      "accountName": "GoPay",
+      "accountIcon": "Smartphone",
+      "tags": ["#kuliner", "#kopi"],
+      "createdAt": "2026-08-23T12:45:00.000Z"
+    },
+    {
+      "id": "tx_demo_5",
+      "type": "EXPENSE",
+      "amount": 250000,
+      "date": "2026-08-21 16:20",
+      "description": "Isi Bensin Pertamax Turbo",
+      "categoryId": "cat_transport",
+      "categoryName": "Transportasi & Bensin",
+      "categoryIcon": "Car",
+      "categoryColor": "#F97316",
+      "accountId": "acc_cash",
+      "accountName": "Uang Tunai (Dompet)",
+      "accountIcon": "Wallet",
+      "tags": ["#kendaraan", "#bensin"],
+      "createdAt": "2026-08-21T16:20:00.000Z"
+    },
+    {
+      "id": "tx_demo_6",
+      "type": "EXPENSE",
+      "amount": 850000,
+      "date": "2026-08-19 19:30",
+      "description": "Belanja Bulanan Supermarket",
+      "categoryId": "cat_shopping",
+      "categoryName": "Belanja & Kebutuhan",
+      "categoryIcon": "ShoppingBag",
+      "categoryColor": "#EC4899",
+      "accountId": "acc_bca",
+      "accountName": "Bank BCA",
+      "accountIcon": "Landmark",
+      "tags": ["#belanja", "#kebutuhan"],
+      "createdAt": "2026-08-19T19:30:00.000Z"
+    },
+    {
+      "id": "tx_demo_7",
+      "type": "EXPENSE",
+      "amount": 200000,
+      "date": "2026-08-17 21:00",
+      "description": "Tiket Bioskop Premiere & Popcorn",
+      "categoryId": "cat_entertainment",
+      "categoryName": "Hiburan & Rekreasi",
+      "categoryIcon": "Gamepad2",
+      "categoryColor": "#8B5CF6",
+      "accountId": "acc_gopay",
+      "accountName": "GoPay",
+      "accountIcon": "Smartphone",
+      "tags": ["#hiburan", "#weekend"],
+      "createdAt": "2026-08-17T21:00:00.000Z"
+    },
+    {
+      "id": "tx_demo_8",
+      "type": "EXPENSE",
+      "amount": 500000,
+      "date": "2026-08-16 11:30",
+      "description": "Sedekah Jumat & Infaq Masjid",
+      "categoryId": "cat_social",
+      "categoryName": "Sedekah & Donasi",
+      "categoryIcon": "HeartHandshake",
+      "categoryColor": "#10B981",
+      "accountId": "acc_bca",
+      "accountName": "Bank BCA",
+      "accountIcon": "Landmark",
+      "tags": ["#sedekah"],
+      "createdAt": "2026-08-16T11:30:00.000Z"
+    },
+    {
+      "id": "tx_demo_9",
+      "type": "TRANSFER",
+      "amount": 500000,
+      "date": "2026-08-20 15:00",
+      "description": "Top-up saldo GoPay dari BCA",
+      "categoryId": "cat_transfer",
+      "categoryName": "Transfer Antar Dompet",
+      "categoryIcon": "ArrowRightLeft",
+      "categoryColor": "#6366F1",
+      "accountId": "acc_bca",
+      "accountName": "Bank BCA",
+      "accountIcon": "Landmark",
+      "toAccountId": "acc_gopay",
+      "toAccountName": "GoPay",
+      "tags": ["#topup"],
+      "createdAt": "2026-08-20T15:00:00.000Z"
+    }
+  ]
+}

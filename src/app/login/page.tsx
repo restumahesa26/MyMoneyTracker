@@ -53,8 +53,12 @@ export default function LoginPage() {
       }
       router.push("/");
     } catch (err: any) {
-      console.error(err);
-      if (err.code === "auth/operation-not-allowed" || err.code === "auth/configuration-not-found") {
+      console.error("Email auth error:", err);
+      if (err.code === "auth/configuration-not-found") {
+        toast.error("Konfigurasi Firebase belum ditemukan. Pastikan Environment Variables sudah diatur di Vercel.");
+      } else if (err.code === "auth/unauthorized-domain") {
+        toast.error("Domain Vercel belum didaftarkan di Firebase Console > Authentication > Settings > Authorized domains.");
+      } else if (err.code === "auth/operation-not-allowed") {
         toast.error("Provider Email/Password belum diaktifkan di Firebase Console > Authentication > Sign-in method.");
       } else if (err.code === "auth/email-already-in-use") {
         toast.error("Email ini sudah terdaftar. Silakan pilih tab 'Masuk (Login)'.");
@@ -77,8 +81,12 @@ export default function LoginPage() {
       toast.success("Berhasil masuk dengan Google!");
       router.push("/");
     } catch (err: any) {
-      console.error(err);
-      if (err.code === "auth/configuration-not-found" || err.code === "auth/operation-not-allowed") {
+      console.error("Google auth error:", err);
+      if (err.code === "auth/unauthorized-domain") {
+        toast.error("Domain Vercel belum didaftarkan di Firebase Console > Authentication > Settings > Authorized domains.");
+      } else if (err.code === "auth/configuration-not-found") {
+        toast.error("Konfigurasi Firebase belum lengkap. Pastikan Environment Variables sudah diatur di Vercel.");
+      } else if (err.code === "auth/operation-not-allowed") {
         toast.error("Provider Google belum diaktifkan di Firebase Console > Authentication > Sign-in method.");
       } else if (err.code === "auth/popup-closed-by-user") {
         toast.info("Proses login Google dibatalkan.");

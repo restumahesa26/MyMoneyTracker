@@ -13,6 +13,18 @@ export const metadata: Metadata = {
   title: "MyMoneyTracker - Personal Finance Management",
   description:
     "Aplikasi pencatatan keuangan pribadi modern, elegan, dan kaya fitur dengan Next.js dan Firebase",
+  icons: {
+    icon: [
+      { url: "/favicon/favicon.ico" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    shortcut: "/favicon/favicon.ico",
+    apple: [
+      { url: "/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/favicon/site.webmanifest",
 };
 
 export default function RootLayout({

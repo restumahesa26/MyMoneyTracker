@@ -53,8 +53,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-              <Wallet className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform overflow-hidden p-1">
+              <img
+                src="/favicon/favicon-96x96.png"
+                alt="MyMoneyTracker Logo"
+                className="w-full h-full object-contain rounded-lg"
+              />
             </div>
             <div>
               <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-emerald-500 dark:from-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent">

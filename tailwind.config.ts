@@ -58,6 +58,10 @@ const config: Config = {
           light: "#E0E7FF",
           dark: "#312E81",
         },
+        slate: {
+          750: "#1e293b",
+          850: "#111827",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

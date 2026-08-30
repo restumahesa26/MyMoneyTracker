@@ -82,7 +82,7 @@ export default function DashboardPage() {
             </button>
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold hover:bg-slate-50 transition-all"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700/80 transition-all"
             >
               <PlusCircle className="w-3.5 h-3.5 text-emerald-500" />
               <span>Catat Cepat</span>

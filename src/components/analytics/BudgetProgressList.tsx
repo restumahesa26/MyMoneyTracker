@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useFinance } from "@/context/FinanceContext";
 import { formatIDR, formatCompactIDR } from "@/lib/formatters";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import { Target, AlertTriangle, CheckCircle2, AlertOctagon } from "lucide-react";
+import { Target, AlertTriangle, CheckCircle2, AlertOctagon, Flame } from "lucide-react";
 
 export const BudgetProgressList: React.FC = () => {
   const { categories, filteredTransactions } = useFinance();
@@ -46,15 +46,15 @@ export const BudgetProgressList: React.FC = () => {
   }, [categories, filteredTransactions]);
 
   return (
-    <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-card">
-      <div className="flex items-center justify-between mb-5">
+    <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-card space-y-4">
+      <div className="flex items-center justify-between">
         <div>
           <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
             <Target className="w-4 h-4 text-indigo-500" />
-            <span>Realisasi Anggaran (Budget vs Actual)</span>
+            <span>Disiplin Anggaran (Budget vs Actual)</span>
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Monitoring batas pengeluaran per kategori
+            Monitoring batas pagu pengeluaran &amp; pencegahan kebocoran
           </p>
         </div>
         <Link
@@ -67,10 +67,10 @@ export const BudgetProgressList: React.FC = () => {
 
       {budgetStats.length === 0 ? (
         <div className="py-8 text-center text-xs text-slate-400">
-          Belum ada batas budget yang diatur. Silakan atur budget di menu Kategori.
+          Belum ada batas anggaran yang diatur. Silakan tentukan limit pengeluaran di menu Kategori.
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3.5 max-h-[380px] overflow-y-auto pr-1">
           {budgetStats.map((item) => {
             const isDanger = item.status === "DANGER";
             const isWarning = item.status === "WARNING";
@@ -96,7 +96,7 @@ export const BudgetProgressList: React.FC = () => {
                         {item.name}
                       </p>
                       <p className="text-[10px] text-slate-400">
-                        Budget: {formatIDR(item.budget)}
+                        Batas: {formatIDR(item.budget)}
                       </p>
                     </div>
                   </div>

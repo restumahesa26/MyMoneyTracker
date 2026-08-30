@@ -485,7 +485,7 @@ export default function SettingsPage() {
         <div className="flex flex-wrap gap-3">
           <button
             onClick={handleDownloadCSV}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition-colors"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
             <span>Ekspor Semua Transaksi (.CSV)</span>
@@ -493,7 +493,7 @@ export default function SettingsPage() {
 
           <button
             onClick={handleDownloadJSON}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition-colors"
           >
             <FileJson className="w-4 h-4 text-indigo-500" />
             <span>Backup Lengkap (.JSON)</span>
@@ -501,7 +501,7 @@ export default function SettingsPage() {
 
           <button
             onClick={() => setShowImportBox(!showImportBox)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition-colors"
           >
             <Upload className="w-4 h-4 text-amber-500" />
             <span>Pulihkan Data dari JSON</span>

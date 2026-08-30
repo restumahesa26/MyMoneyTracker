@@ -242,7 +242,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 className={`py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                   type === "EXPENSE"
                     ? "bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 shadow-sm border border-slate-200/50 dark:border-slate-800"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                 }`}
               >
                 <ArrowUpCircle className="w-4 h-4" />
@@ -254,7 +254,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 className={`py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                   type === "INCOME"
                     ? "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/50 dark:border-slate-800"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                 }`}
               >
                 <ArrowDownCircle className="w-4 h-4" />

@@ -26,7 +26,7 @@ export const CategoryBreakdownChart: React.FC = () => {
   const breakdownData = useMemo(() => {
     const categoryTotals: Record<
       string,
-      { name: string; icon: string; color: string; total: number }
+      { name: string; icon: string; color: string; total: number; count: number }
     > = {};
 
     let totalSum = 0;
@@ -45,9 +45,11 @@ export const CategoryBreakdownChart: React.FC = () => {
             icon: catIcon,
             color: catColor,
             total: 0,
+            count: 0,
           };
         }
         categoryTotals[catKey].total += tx.amount;
+        categoryTotals[catKey].count += 1;
         totalSum += tx.amount;
       });
 
@@ -55,6 +57,8 @@ export const CategoryBreakdownChart: React.FC = () => {
       name: item.name,
       icon: item.icon,
       value: item.total,
+      count: item.count,
+      avg: item.count > 0 ? Math.round(item.total / item.count) : 0,
       percentage: totalSum > 0 ? (item.total / totalSum) * 100 : 0,
       color: item.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
     }));
@@ -69,10 +73,13 @@ export const CategoryBreakdownChart: React.FC = () => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 shadow-xl text-xs">
-          <p className="font-bold text-slate-800 dark:text-slate-100 mb-1">{data.name}</p>
+        <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 shadow-xl text-xs space-y-1">
+          <p className="font-bold text-slate-800 dark:text-slate-100">{data.name}</p>
           <p className="text-slate-600 dark:text-slate-300 font-semibold">{formatIDR(data.value)}</p>
-          <p className="text-slate-400 text-[11px]">{data.percentage.toFixed(1)}% dari total</p>
+          <div className="text-[11px] text-slate-400 space-y-0.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <p>{data.percentage.toFixed(1)}% dari total</p>
+            <p>{data.count} transaksi (rata-rata {formatCompactIDR(data.avg)}/trx)</p>
+          </div>
         </div>
       );
     }
@@ -87,10 +94,10 @@ export const CategoryBreakdownChart: React.FC = () => {
           <div>
             <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
               <PieIcon className="w-4 h-4 text-indigo-500" />
-              <span>Distribusi Kategori</span>
+              <span>Distribusi & Porsi Kategori</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Porsi alokasi dana per kategori
+              Analisis alokasi dana dan intensitas transaksi
             </p>
           </div>
 
@@ -148,7 +155,7 @@ export const CategoryBreakdownChart: React.FC = () => {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400">Total</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400">Total {activeTab === "EXPENSE" ? "Keluar" : "Masuk"}</span>
                 <span className="text-sm font-black text-slate-800 dark:text-slate-100">
                   {formatCompactIDR(breakdownData.totalSum)}
                 </span>
@@ -158,7 +165,7 @@ export const CategoryBreakdownChart: React.FC = () => {
             {/* Top Categories Ranking List */}
             <div className="space-y-3">
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                Top Peringkat Kategori
+                Peringkat Alokasi Terbesar
               </p>
               <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
                 {breakdownData.list.slice(0, 5).map((item) => (
@@ -171,6 +178,9 @@ export const CategoryBreakdownChart: React.FC = () => {
                         />
                         <span className="font-semibold text-slate-700 dark:text-slate-200 truncate">
                           {item.name}
+                        </span>
+                        <span className="text-[10px] text-slate-400 shrink-0">
+                          ({item.count}x)
                         </span>
                       </div>
                       <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-100 shrink-0">

@@ -280,7 +280,7 @@ export default function RecordTransactionPage() {
               className={`py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                 type === "EXPENSE"
                   ? "bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 shadow-sm border border-slate-200/50 dark:border-slate-800"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
               }`}
             >
               <ArrowUpCircle className="w-4 h-4" />
@@ -293,7 +293,7 @@ export default function RecordTransactionPage() {
               className={`py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                 type === "INCOME"
                   ? "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/50 dark:border-slate-800"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
               }`}
             >
               <ArrowDownCircle className="w-4 h-4" />
@@ -306,7 +306,7 @@ export default function RecordTransactionPage() {
               className={`py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                 type === "TRANSFER"
                   ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200/50 dark:border-slate-800"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
               }`}
             >
               <ArrowRightLeft className="w-4 h-4" />
@@ -462,7 +462,7 @@ export default function RecordTransactionPage() {
                           await loadDefaultCategoriesToReal();
                           toast.success("Kategori bawaan berhasil dimuat!");
                         }}
-                        className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-750 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-300"
+                        className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
                       >
                         Muat Kategori Bawaan
                       </button>
@@ -480,7 +480,7 @@ export default function RecordTransactionPage() {
                           className={`p-2.5 rounded-2xl flex items-center gap-2.5 text-xs font-semibold border transition-all text-left ${
                             isSelected
                               ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-sm"
-                              : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
+                              : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                           }`}
                         >
                           <div
@@ -542,7 +542,7 @@ export default function RecordTransactionPage() {
                           className={`p-3 rounded-2xl flex items-center justify-between border transition-all ${
                             isSelected
                               ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-sm"
-                              : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
+                              : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">

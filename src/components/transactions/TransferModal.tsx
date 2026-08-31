@@ -21,7 +21,7 @@ interface TransferModalProps {
 }
 
 export const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose }) => {
-  const { accounts, transferFunds } = useFinance();
+  const { accounts, transferFunds, isBalanceHidden } = useFinance();
 
   const [fromAccountId, setFromAccountId] = useState<string>("");
   const [toAccountId, setToAccountId] = useState<string>("");
@@ -124,7 +124,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose })
                 >
                   {accounts.map((acc) => (
                     <option key={acc.id} value={acc.id}>
-                      {acc.name} ({formatIDR(acc.balance)})
+                      {acc.name} ({formatIDR(acc.balance, isBalanceHidden)})
                     </option>
                   ))}
                 </select>
@@ -149,7 +149,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose })
                 >
                   {accounts.map((acc) => (
                     <option key={acc.id} value={acc.id} disabled={acc.id === fromAccountId}>
-                      {acc.name} ({formatIDR(acc.balance)})
+                      {acc.name} ({formatIDR(acc.balance, isBalanceHidden)})
                     </option>
                   ))}
                 </select>

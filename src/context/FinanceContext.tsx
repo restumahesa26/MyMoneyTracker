@@ -66,6 +66,9 @@ interface FinanceContextType {
   ) => Promise<void>;
   resetToDemoData: () => void;
   resetToDefaultJSON: () => void;
+  isBalanceHidden: boolean;
+  setIsBalanceHidden: (hidden: boolean) => void;
+  toggleBalanceVisibility: (forced?: boolean) => void;
   exportDataJSON: () => string;
   exportDataCSV: () => string;
   importDataJSON: (jsonString: string) => boolean;
@@ -96,6 +99,36 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setDataSourceState(mode);
     if (typeof window !== "undefined") {
       localStorage.setItem("mmt_data_source", mode);
+    }
+  };
+
+  // Balance visibility privacy state
+  const [isBalanceHidden, setIsBalanceHiddenState] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("mmt_hide_balance");
+      return saved === "true";
+    }
+    return false;
+  });
+
+  const setIsBalanceHidden = (hidden: boolean) => {
+    setIsBalanceHiddenState(hidden);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("mmt_hide_balance", String(hidden));
+    }
+  };
+
+  const toggleBalanceVisibility = (forced?: boolean) => {
+    const nextVal = typeof forced === "boolean" ? forced : !isBalanceHidden;
+    setIsBalanceHidden(nextVal);
+    if (nextVal) {
+      toast.info("Mode Privasi Aktif", {
+        description: "Saldo dompet dan rekening berhasil disembunyikan.",
+      });
+    } else {
+      toast.success("Mode Privasi Nonaktif", {
+        description: "Saldo dompet dan rekening kini ditampilkan.",
+      });
     }
   };
 
@@ -766,6 +799,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         transferFunds,
         resetToDemoData,
         resetToDefaultJSON,
+        isBalanceHidden,
+        setIsBalanceHidden,
+        toggleBalanceVisibility,
         exportDataJSON,
         exportDataCSV,
         importDataJSON,

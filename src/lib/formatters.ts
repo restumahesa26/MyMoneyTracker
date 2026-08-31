@@ -17,7 +17,10 @@ import {
 import { id } from "date-fns/locale";
 import { DateFilterState, DateRangePreset } from "@/types";
 
-export function formatIDR(amount: number): string {
+export function formatIDR(amount: number, hideBalance: boolean = false): string {
+  if (hideBalance) {
+    return "Rp ••••••";
+  }
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
@@ -26,7 +29,10 @@ export function formatIDR(amount: number): string {
   }).format(amount);
 }
 
-export function formatCompactIDR(amount: number): string {
+export function formatCompactIDR(amount: number, hideBalance: boolean = false): string {
+  if (hideBalance) {
+    return "Rp •••";
+  }
   if (Math.abs(amount) >= 1_000_000_000) {
     return `Rp ${(amount / 1_000_000_000).toFixed(1)} M`;
   }

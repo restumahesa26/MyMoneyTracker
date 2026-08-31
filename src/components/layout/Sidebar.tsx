@@ -18,6 +18,8 @@ import {
   ArrowRightLeft,
   LogOut,
   Wallet,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -82,7 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const pathname = usePathname();
   const { user, isDemo, logout } = useAuth();
-  const { dataSource } = useFinance();
+  const { dataSource, isBalanceHidden, toggleBalanceVisibility } = useFinance();
 
   const renderNavLinks = () => (
     <div className="space-y-1">
@@ -271,8 +273,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Bottom Drawer info & Logout */}
             <div className="pt-4 mt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              {/* Privacy balance toggle on mobile drawer */}
+              <button
+                type="button"
+                onClick={() => toggleBalanceVisibility()}
+                className={`w-full flex items-center justify-between py-2 px-3 rounded-xl text-xs font-bold border transition-colors ${
+                  isBalanceHidden
+                    ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800"
+                    : "bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  {isBalanceHidden ? (
+                    <EyeOff className="w-4 h-4 text-indigo-500" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-slate-400" />
+                  )}
+                  <span>Mode Sembunyikan Saldo</span>
+                </div>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
+                    isBalanceHidden
+                      ? "bg-indigo-600 text-white"
+                      : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+                  }`}
+                >
+                  {isBalanceHidden ? "AKTIF" : "OFF"}
+                </span>
+              </button>
+
               <div className="flex items-center gap-3">
-                <UserAvatar photoURL={user?.photoURL} name={user?.displayName || user?.email} size="md" />
+                <UserAvatar
+                  photoURL={user?.photoURL}
+                  name={user?.displayName || user?.email}
+                  size="md"
+                />
                 <div className="min-w-0 flex-1 truncate">
                   <p className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">
                     {user?.displayName || "Pengguna"}

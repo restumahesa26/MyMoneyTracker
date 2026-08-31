@@ -16,11 +16,13 @@ import {
   CreditCard,
   Smartphone,
   Landmark,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 
 export const WalletCardList: React.FC = () => {
-  const { accounts, deleteAccount } = useFinance();
+  const { accounts, deleteAccount, isBalanceHidden, toggleBalanceVisibility } = useFinance();
   const [editingAcc, setEditingAcc] = useState<Account | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
@@ -55,22 +57,47 @@ export const WalletCardList: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header & Add Button */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-            Daftar Dompet & Rekening
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+              Daftar Dompet & Rekening
+            </h2>
+            {isBalanceHidden && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                <EyeOff className="w-3 h-3" />
+                Saldo Disembunyikan
+              </span>
+            )}
+          </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Kelola saldo dan mutasi akun keuangan Anda
           </p>
         </div>
-        <button
-          onClick={handleAddNew}
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/25 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tambah Dompet</span>
-        </button>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => toggleBalanceVisibility()}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition-all ${
+              isBalanceHidden
+                ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 shadow-xs"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
+            }`}
+            title={isBalanceHidden ? "Tampilkan Saldo" : "Sembunyikan Saldo (Mode Privasi)"}
+          >
+            {isBalanceHidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            <span>{isBalanceHidden ? "Buka Saldo" : "Sembunyikan Saldo"}</span>
+          </button>
+
+          <button
+            onClick={handleAddNew}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/25 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tambah Dompet</span>
+          </button>
+        </div>
       </div>
 
       {/* Grid of Cards or Empty State */}
@@ -186,7 +213,7 @@ export const WalletCardList: React.FC = () => {
                   Saldo Saat Ini
                 </span>
                 <p className="text-xl font-black text-slate-900 dark:text-slate-50 tracking-tight">
-                  {formatIDR(acc.balance)}
+                  {formatIDR(acc.balance, isBalanceHidden)}
                 </p>
               </div>
             </div>

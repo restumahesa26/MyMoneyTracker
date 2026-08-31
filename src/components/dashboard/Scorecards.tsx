@@ -11,10 +11,12 @@ import {
   Flame,
   ArrowUpRight,
   ArrowDownRight,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 export const Scorecards: React.FC = () => {
-  const { metrics, dateFilter } = useFinance();
+  const { metrics, dateFilter, isBalanceHidden, toggleBalanceVisibility } = useFinance();
 
   const isIncomeUp = metrics.incomeGrowth >= 0;
   const isExpenseUp = metrics.expenseGrowth >= 0;
@@ -28,16 +30,24 @@ export const Scorecards: React.FC = () => {
           <span className="text-xs font-semibold text-indigo-100 uppercase tracking-wider">
             Total Saldo Bersih
           </span>
-          <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
-            <Wallet className="w-4 h-4" />
-          </div>
+          <button
+            type="button"
+            onClick={() => toggleBalanceVisibility()}
+            className="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center text-white transition-colors cursor-pointer"
+            title={isBalanceHidden ? "Tampilkan Saldo" : "Sembunyikan Saldo (Mode Privasi)"}
+            aria-label="Toggle Privasi Saldo"
+          >
+            {isBalanceHidden ? <EyeOff className="w-4 h-4" /> : <Wallet className="w-4 h-4" />}
+          </button>
         </div>
         <div>
           <div className="text-xl sm:text-2xl font-black tracking-tight mb-1">
-            {formatIDR(metrics.totalBalance)}
+            {formatIDR(metrics.totalBalance, isBalanceHidden)}
           </div>
           <p className="text-[11px] text-indigo-200">
-            Total aset di semua dompet & rekening
+            {isBalanceHidden
+              ? "Mode privasi aktif • Saldo disembunyikan"
+              : "Total aset di semua dompet & rekening"}
           </p>
         </div>
       </div>

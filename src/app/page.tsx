@@ -29,6 +29,8 @@ import {
   RotateCcw,
   Plus,
   AlertCircle,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
@@ -42,6 +44,8 @@ export default function RecordTransactionPage() {
     transferFunds,
     loadDefaultCategoriesToReal,
     dataSource,
+    isBalanceHidden,
+    toggleBalanceVisibility,
   } = useFinance();
 
   const [type, setType] = useState<TransactionType>("EXPENSE");
@@ -555,7 +559,7 @@ export default function RecordTransactionPage() {
                             <div className="text-left min-w-0">
                               <p className="text-xs font-bold truncate">{acc.name}</p>
                               <p className="text-[10px] text-slate-400 truncate">
-                                {formatIDR(acc.balance)}
+                                {formatIDR(acc.balance, isBalanceHidden)}
                               </p>
                             </div>
                           </div>
@@ -598,7 +602,7 @@ export default function RecordTransactionPage() {
                       >
                         {accounts.map((acc) => (
                           <option key={acc.id} value={acc.id}>
-                            {acc.name} ({formatIDR(acc.balance)})
+                            {acc.name} ({formatIDR(acc.balance, isBalanceHidden)})
                           </option>
                         ))}
                       </select>
@@ -615,7 +619,7 @@ export default function RecordTransactionPage() {
                       >
                         {accounts.map((acc) => (
                           <option key={acc.id} value={acc.id} disabled={acc.id === accountId}>
-                            {acc.name} ({formatIDR(acc.balance)})
+                            {acc.name} ({formatIDR(acc.balance, isBalanceHidden)})
                           </option>
                         ))}
                       </select>
@@ -806,13 +810,23 @@ export default function RecordTransactionPage() {
                 <Wallet className="w-4 h-4 text-indigo-500" />
                 <span>Saldo Dompet & Rekening</span>
               </h3>
-              <button
-                type="button"
-                onClick={() => setIsWalletModalOpen(true)}
-                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                + Tambah &rarr;
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => toggleBalanceVisibility()}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  title={isBalanceHidden ? "Tampilkan Saldo" : "Sembunyikan Saldo"}
+                >
+                  {isBalanceHidden ? <EyeOff className="w-4 h-4 text-indigo-500" /> : <Eye className="w-4 h-4" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsWalletModalOpen(true)}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  + Tambah &rarr;
+                </button>
+              </div>
             </div>
 
             {accounts.length === 0 ? (
@@ -861,7 +875,7 @@ export default function RecordTransactionPage() {
                       </div>
                     </div>
                     <p className="text-xs font-black text-slate-900 dark:text-slate-100">
-                      {formatIDR(acc.balance)}
+                      {formatIDR(acc.balance, isBalanceHidden)}
                     </p>
                   </div>
                 ))}

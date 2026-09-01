@@ -28,6 +28,8 @@ import {
   Camera,
   Check,
   Info,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { id as localeId } from "date-fns/locale";
@@ -44,6 +46,8 @@ export default function SettingsPage() {
     exportDataJSON,
     exportDataCSV,
     importDataJSON,
+    isBalanceHidden,
+    toggleBalanceVisibility,
   } = useFinance();
 
   const [displayName, setDisplayName] = useState(user?.displayName || "");
@@ -239,11 +243,10 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => handleSelectAvatarPreset(user.photoURL!)}
-                  className={`p-1 rounded-xl border transition-all flex items-center gap-1.5 text-xs px-2.5 py-1 ${
-                    customPhotoURL === user.photoURL
+                  className={`p-1 rounded-xl border transition-all flex items-center gap-1.5 text-xs px-2.5 py-1 ${customPhotoURL === user.photoURL
                       ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 font-bold"
                       : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                  }`}
+                    }`}
                 >
                   <UserAvatar photoURL={user.photoURL} size="sm" />
                   <span>Foto Google Asli</span>
@@ -261,11 +264,10 @@ export default function SettingsPage() {
                   key={preset.name}
                   type="button"
                   onClick={() => handleSelectAvatarPreset(preset.url)}
-                  className={`p-1 rounded-xl border transition-all flex items-center gap-1.5 text-xs px-2.5 py-1 ${
-                    customPhotoURL === preset.url
+                  className={`p-1 rounded-xl border transition-all flex items-center gap-1.5 text-xs px-2.5 py-1 ${customPhotoURL === preset.url
                       ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 font-bold"
                       : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                  }`}
+                    }`}
                 >
                   <UserAvatar photoURL={preset.url} size="sm" />
                   <span>{preset.name}</span>
@@ -309,11 +311,10 @@ export default function SettingsPage() {
           </div>
 
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold self-start sm:self-auto ${
-              dataSource === "FIREBASE"
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold self-start sm:self-auto ${dataSource === "FIREBASE"
                 ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60"
                 : "bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60"
-            }`}
+              }`}
           >
             <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
             Aktif: {dataSource === "FIREBASE" ? "Firebase Cloud" : "Dummy Data (JSON)"}
@@ -325,11 +326,10 @@ export default function SettingsPage() {
           {/* Option A: Firebase Real Data */}
           <div
             onClick={() => handleSwitchDataSource("FIREBASE")}
-            className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
-              dataSource === "FIREBASE"
+            className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${dataSource === "FIREBASE"
                 ? "bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-500 shadow-md"
                 : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
-            }`}
+              }`}
           >
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -375,11 +375,10 @@ export default function SettingsPage() {
           {/* Option B: Dummy / Mock Data from JSON */}
           <div
             onClick={() => handleSwitchDataSource("LOCAL_DUMMY")}
-            className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
-              dataSource === "LOCAL_DUMMY"
+            className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${dataSource === "LOCAL_DUMMY"
                 ? "bg-amber-50/70 dark:bg-amber-950/40 border-amber-500 shadow-md"
                 : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
-            }`}
+              }`}
           >
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -439,11 +438,10 @@ export default function SettingsPage() {
         <div className="grid grid-cols-3 gap-3 max-w-md">
           <button
             onClick={() => setTheme("light")}
-            className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-2 transition-all ${
-              theme === "light"
+            className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-2 transition-all ${theme === "light"
                 ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-            }`}
+                : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
+              }`}
           >
             <Sun className="w-5 h-5 text-amber-500" />
             <span>Terang (Light)</span>
@@ -451,11 +449,10 @@ export default function SettingsPage() {
 
           <button
             onClick={() => setTheme("dark")}
-            className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-2 transition-all ${
-              theme === "dark"
+            className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-2 transition-all ${theme === "dark"
                 ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-            }`}
+                : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
+              }`}
           >
             <Moon className="w-5 h-5 text-indigo-400" />
             <span>Gelap (Dark)</span>
@@ -463,15 +460,61 @@ export default function SettingsPage() {
 
           <button
             onClick={() => setTheme("system")}
-            className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-2 transition-all ${
-              theme === "system"
+            className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-2 transition-all ${theme === "system"
                 ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-            }`}
+                : "bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
+              }`}
           >
             <Laptop className="w-5 h-5 text-slate-400" />
             <span>Sistem</span>
           </button>
+        </div>
+      </div>
+
+      {/* 2.5. Balance Visibility & Privacy Preferences */}
+      <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-card space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              {isBalanceHidden ? (
+                <EyeOff className="w-4 h-4 text-indigo-500" />
+              ) : (
+                <Eye className="w-4 h-4 text-indigo-500" />
+              )}
+              <span>Privasi & Tampilan Saldo</span>
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Sembunyikan nominal saldo uang di dompet dan rekening saat membuka aplikasi di tempat umum
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => toggleBalanceVisibility()}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold transition-all shadow-sm self-start sm:self-auto ${isBalanceHidden
+                ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20"
+                : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
+              }`}
+          >
+            {isBalanceHidden ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            <span>{isBalanceHidden ? "Mode Privasi: AKTIF" : "Mode Privasi: NONAKTIF"}</span>
+          </button>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850/60 border border-slate-200/60 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div>
+            <span className="font-bold text-slate-700 dark:text-slate-300 block">
+              Pratinjau Tampilan Nominal:
+            </span>
+            <span className="text-slate-400 text-[11px]">
+              {isBalanceHidden
+                ? "Saldo ditampilkan dengan karakter sensor untuk keamanan visual"
+                : "Saldo ditampilkan dengan nominal lengkap IDR"}
+            </span>
+          </div>
+          <div className="font-mono text-base font-black px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 self-start sm:self-auto">
+            {isBalanceHidden ? "Rp ••••••" : "Rp 25.450.000"}
+          </div>
         </div>
       </div>
 
@@ -577,14 +620,14 @@ export default function SettingsPage() {
             <span className="font-bold text-slate-800 dark:text-slate-100">
               {process.env.NEXT_PUBLIC_APP_LAST_UPDATED
                 ? (() => {
-                    try {
-                      return format(parseISO(process.env.NEXT_PUBLIC_APP_LAST_UPDATED), "d MMMM yyyy, HH:mm", {
-                        locale: localeId,
-                      });
-                    } catch {
-                      return process.env.NEXT_PUBLIC_APP_LAST_UPDATED;
-                    }
-                  })()
+                  try {
+                    return format(parseISO(process.env.NEXT_PUBLIC_APP_LAST_UPDATED), "d MMMM yyyy, HH:mm", {
+                      locale: localeId,
+                    });
+                  } catch {
+                    return process.env.NEXT_PUBLIC_APP_LAST_UPDATED;
+                  }
+                })()
                 : "Terbaru"}
             </span>
           </div>

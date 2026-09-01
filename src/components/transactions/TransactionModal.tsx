@@ -34,7 +34,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   initialType = "EXPENSE",
   editTransaction = null,
 }) => {
-  const { accounts, categories, addTransaction, updateTransaction } = useFinance();
+  const { accounts, categories, addTransaction, updateTransaction, isBalanceHidden } = useFinance();
 
   const [type, setType] = useState<TransactionType>(initialType);
   const [amountRaw, setAmountRaw] = useState<string>("");
@@ -393,7 +393,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               >
                 {accounts.map((acc) => (
                   <option key={acc.id} value={acc.id}>
-                    {acc.name} ({formatIDR(acc.balance)})
+                    {acc.name} ({formatIDR(acc.balance, isBalanceHidden)})
                   </option>
                 ))}
               </select>

@@ -44,7 +44,18 @@ export default function RootLayout({
           <AuthProvider>
             <FinanceProvider>
               <AppLayout>{children}</AppLayout>
-              <Toaster richColors position="top-right" />
+              <Toaster
+                richColors
+                closeButton
+                position="top-right"
+                duration={4500}
+                toastOptions={{
+                  classNames: {
+                    closeButton:
+                      "!bg-white/90 dark:!bg-slate-800/90 !text-slate-600 dark:!text-slate-300 !border !border-slate-200 dark:!border-slate-700 hover:!scale-105 hover:!bg-slate-100 dark:hover:!bg-slate-700 transition-all",
+                  },
+                }}
+              />
             </FinanceProvider>
           </AuthProvider>
         </ThemeProvider>

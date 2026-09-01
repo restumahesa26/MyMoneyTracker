@@ -16,6 +16,8 @@ import {
   ShieldCheck,
   Menu,
   User as UserIcon,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -33,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { theme, setTheme } = useTheme();
   const { user, isDemo, logout } = useAuth();
-  const { dataSource } = useFinance();
+  const { dataSource, isBalanceHidden, toggleBalanceVisibility } = useFinance();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   return (
@@ -113,6 +115,39 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
+          {/* Balance Visibility Toggle (Privacy Mode) */}
+          <button
+            type="button"
+            onClick={() => toggleBalanceVisibility()}
+            className={`p-2 rounded-xl transition-all border flex items-center gap-1.5 ${
+              isBalanceHidden
+                ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 shadow-sm"
+                : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+            }`}
+            title={
+              isBalanceHidden
+                ? "Tampilkan Saldo (Klik untuk membuka privasi)"
+                : "Sembunyikan Saldo (Mode Privasi)"
+            }
+            aria-label={isBalanceHidden ? "Tampilkan Saldo" : "Sembunyikan Saldo"}
+          >
+            {isBalanceHidden ? (
+              <>
+                <EyeOff className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="hidden xl:inline text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+                  Saldo Tersembunyi
+                </span>
+              </>
+            ) : (
+              <>
+                <Eye className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                <span className="hidden xl:inline text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                  Privasi Saldo
+                </span>
+              </>
+            )}
+          </button>
+
           {/* Theme Toggle */}
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -149,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className="fixed inset-0 z-40"
                   onClick={() => setShowProfileMenu(false)}
                 />
-                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl py-2 z-50 animate-scale-in">
+                <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl py-2 z-50 animate-scale-in">
                   <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
                     <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">
                       {user?.displayName || "Pengguna"}
@@ -165,6 +200,33 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
 
                   <div className="py-1">
+                    {/* Privacy Toggle Menu Item */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        toggleBalanceVisibility();
+                      }}
+                      className="w-full flex items-center justify-between px-4 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        {isBalanceHidden ? (
+                          <EyeOff className="w-4 h-4 text-indigo-500" />
+                        ) : (
+                          <Eye className="w-4 h-4 text-slate-400" />
+                        )}
+                        <span>Sembunyikan Saldo</span>
+                      </div>
+                      <span
+                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
+                          isBalanceHidden
+                            ? "bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                        }`}
+                      >
+                        {isBalanceHidden ? "AKTIF" : "OFF"}
+                      </span>
+                    </button>
+
                     {isDemo && (
                       <Link
                         href="/login"

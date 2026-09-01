@@ -89,3 +89,36 @@ export interface DashboardMetrics {
   expenseGrowth: number; // % vs previous period
   transactionCount: number;
 }
+
+export type DebtType = "DEBT" | "RECEIVABLE";
+
+export type DebtStatus = "UNPAID" | "PARTIAL" | "PAID" | "OVERDUE";
+
+export interface DebtPayment {
+  id: string;
+  date: string;
+  amount: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface Debt {
+  id: string;
+  title: string;
+  type: DebtType; // "DEBT" (Hutang Saya) atau "RECEIVABLE" (Piutang)
+  lenderName: string; // Dimana / Bayar ke siapa
+  category: string;
+  originalAmount: number;
+  remainingAmount: number;
+  paidAmount: number;
+  dueDate: string; // YYYY-MM-DD
+  monthlyInstallment?: number;
+  interestRate?: number;
+  referenceNumber?: string;
+  notes?: string;
+  status: DebtStatus;
+  payments: DebtPayment[];
+  createdAt: string;
+  updatedAt?: string;
+}
+

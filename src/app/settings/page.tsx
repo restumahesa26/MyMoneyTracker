@@ -27,7 +27,10 @@ import {
   User as UserIcon,
   Camera,
   Check,
+  Info,
 } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { id as localeId } from "date-fns/locale";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
@@ -556,6 +559,43 @@ export default function SettingsPage() {
         >
           Reset ke Data JSON Awal
         </button>
+      </div>
+
+      {/* 5. Informasi Versi & Pembaruan Aplikasi */}
+      <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-card space-y-3">
+        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <Info className="w-4 h-4 text-indigo-500" />
+          <span>Informasi Aplikasi & Pembaruan</span>
+        </h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Tanggal pembaruan terakhir diambil secara otomatis dari git commit / build aplikasi.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
+          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
+            <span className="text-slate-500">Pembaruan Terakhir:</span>
+            <span className="font-bold text-slate-800 dark:text-slate-100">
+              {process.env.NEXT_PUBLIC_APP_LAST_UPDATED
+                ? (() => {
+                    try {
+                      return format(parseISO(process.env.NEXT_PUBLIC_APP_LAST_UPDATED), "d MMMM yyyy, HH:mm", {
+                        locale: localeId,
+                      });
+                    } catch {
+                      return process.env.NEXT_PUBLIC_APP_LAST_UPDATED;
+                    }
+                  })()
+                : "Terbaru"}
+            </span>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
+            <span className="text-slate-500">Versi Commit / Hash:</span>
+            <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+              #{process.env.NEXT_PUBLIC_APP_COMMIT_HASH || "build"}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

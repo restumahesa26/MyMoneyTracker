@@ -317,5 +317,109 @@
       "tags": ["#topup"],
       "createdAt": "2026-08-20T15:00:00.000Z"
     }
+  ],
+  "debts": [
+    {
+      "id": "debt_1",
+      "title": "Cicilan Laptop ASUS ROG",
+      "type": "DEBT",
+      "lenderName": "Shopee Paylater",
+      "category": "Paylater & Fintech",
+      "originalAmount": 15000000,
+      "remainingAmount": 5000000,
+      "paidAmount": 10000000,
+      "dueDate": "2026-09-05",
+      "monthlyInstallment": 2500000,
+      "referenceNumber": "SPL-892183921",
+      "notes": "Cicilan 6 bulan, sisa 2 bulan lagi. Bayar via Virtual Account BCA.",
+      "status": "PARTIAL",
+      "payments": [
+        {
+          "id": "pay_1",
+          "date": "2026-07-05",
+          "amount": 2500000,
+          "notes": "Cicilan ke-1",
+          "createdAt": "2026-07-05T10:00:00.000Z"
+        },
+        {
+          "id": "pay_2",
+          "date": "2026-07-20",
+          "amount": 2500000,
+          "notes": "Cicilan ke-2",
+          "createdAt": "2026-07-20T10:00:00.000Z"
+        },
+        {
+          "id": "pay_3",
+          "date": "2026-08-05",
+          "amount": 2500000,
+          "notes": "Cicilan ke-3",
+          "createdAt": "2026-08-05T10:00:00.000Z"
+        },
+        {
+          "id": "pay_4",
+          "date": "2026-08-20",
+          "amount": 2500000,
+          "notes": "Cicilan ke-4",
+          "createdAt": "2026-08-20T10:00:00.000Z"
+        }
+      ],
+      "createdAt": "2026-07-01T08:00:00.000Z"
+    },
+    {
+      "id": "debt_2",
+      "title": "Pinjaman Renovasi Kamar",
+      "type": "DEBT",
+      "lenderName": "Bank BCA (KTA Personal)",
+      "category": "Pinjaman Bank / KTA",
+      "originalAmount": 20000000,
+      "remainingAmount": 20000000,
+      "paidAmount": 0,
+      "dueDate": "2026-09-15",
+      "monthlyInstallment": 2000000,
+      "referenceNumber": "KTA-BCA-993021",
+      "notes": "Autodebet dari rekening BCA tanggal 15 setiap bulan.",
+      "status": "UNPAID",
+      "payments": [],
+      "createdAt": "2026-08-15T09:00:00.000Z"
+    },
+    {
+      "id": "debt_3",
+      "title": "Pinjam Kas Darurat Teman",
+      "type": "DEBT",
+      "lenderName": "Budi Santoso",
+      "category": "Keluarga & Teman",
+      "originalAmount": 1500000,
+      "remainingAmount": 500000,
+      "paidAmount": 1000000,
+      "dueDate": "2026-08-28",
+      "monthlyInstallment": 500000,
+      "notes": "Transfer ke BCA Budi: 5270182910. Sisa 500rb mau dilunasi awal September.",
+      "status": "OVERDUE",
+      "payments": [
+        {
+          "id": "pay_3_1",
+          "date": "2026-08-10",
+          "amount": 1000000,
+          "notes": "Bayar separuh",
+          "createdAt": "2026-08-10T14:00:00.000Z"
+        }
+      ],
+      "createdAt": "2026-08-01T12:00:00.000Z"
+    },
+    {
+      "id": "debt_4",
+      "title": "Pinjaman Modal Usaha Rian",
+      "type": "RECEIVABLE",
+      "lenderName": "Rian Pratama",
+      "category": "Keluarga & Teman",
+      "originalAmount": 3000000,
+      "remainingAmount": 3000000,
+      "paidAmount": 0,
+      "dueDate": "2026-09-25",
+      "notes": "Rian pinjam untuk tambahan modal dagang kopi. Janji bayar akhir September.",
+      "status": "UNPAID",
+      "payments": [],
+      "createdAt": "2026-08-25T11:00:00.000Z"
+    }
   ]
 }

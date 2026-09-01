@@ -6,10 +6,9 @@ import { usePathname } from "next/navigation";
 import {
   PlusCircle,
   LayoutDashboard,
-  BarChart3,
+  HandCoins,
   Receipt,
   Plus,
-  WalletCards,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,17 +19,20 @@ interface MobileNavProps {
 export const MobileNav: React.FC<MobileNavProps> = ({ onOpenTransactionModal }) => {
   const pathname = usePathname();
 
-  const navItems = [
+  const leftNavItems = [
     { href: "/", label: "Catat", icon: PlusCircle },
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/analytics", label: "Analisis", icon: BarChart3 },
+  ];
+
+  const rightNavItems = [
+    { href: "/debts", label: "Hutang", icon: HandCoins },
     { href: "/transactions", label: "Riwayat", icon: Receipt },
   ];
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-[#0b0f17]/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-3 py-2">
       <div className="flex items-center justify-around max-w-lg mx-auto relative">
-        {navItems.slice(0, 2).map((item) => {
+        {leftNavItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
           return (
@@ -65,7 +67,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ onOpenTransactionModal }) 
           </span>
         </div>
 
-        {navItems.slice(2).map((item) => {
+        {rightNavItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
           return (

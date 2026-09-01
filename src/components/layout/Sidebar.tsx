@@ -18,9 +18,11 @@ import {
   ArrowRightLeft,
   LogOut,
   Wallet,
+  HandCoins,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { AppVersionInfo } from "./AppVersionInfo";
 
 export const NAV_ITEMS = [
   {
@@ -45,6 +47,12 @@ export const NAV_ITEMS = [
     name: "Riwayat Transaksi",
     href: "/transactions",
     icon: Receipt,
+    badge: null,
+  },
+  {
+    name: "Hutang & Pinjaman",
+    href: "/debts",
+    icon: HandCoins,
     badge: null,
   },
   {
@@ -168,6 +176,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Settings className="w-4 h-4" />
             </Link>
           </div>
+
+          {/* App Version & Last Update Info */}
+          <AppVersionInfo />
         </div>
       </aside>
 
@@ -293,6 +304,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <LogOut className="w-4 h-4" />
                 <span>Keluar (Sign Out)</span>
               </button>
+
+              {/* App Version & Last Update Info */}
+              <AppVersionInfo />
             </div>
           </div>
         </div>

@@ -18,6 +18,8 @@ import {
   Account,
   Category,
   Transaction,
+  Debt,
+  DebtPayment,
   DateFilterState,
   DashboardMetrics,
   DataSourceMode,
@@ -56,6 +58,21 @@ interface FinanceContextType {
   addCategory: (data: Omit<Category, "id" | "createdAt">) => Promise<void>;
   updateCategory: (id: string, data: Partial<Category>) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
+  debts: Debt[];
+  addDebt: (
+    data: Omit<Debt, "id" | "createdAt" | "paidAmount" | "status" | "payments"> & {
+      paidAmount?: number;
+      payments?: DebtPayment[];
+    }
+  ) => Promise<void>;
+  updateDebt: (id: string, data: Partial<Debt>) => Promise<void>;
+  deleteDebt: (id: string) => Promise<void>;
+  recordDebtPayment: (
+    debtId: string,
+    amount: number,
+    notes?: string,
+    date?: string
+  ) => Promise<void>;
   loadDefaultCategoriesToReal: () => Promise<void>;
   transferFunds: (
     fromAccountId: string,
@@ -78,6 +95,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [debts, setDebts] = useState<Debt[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [dateFilter, setDateFilter] = useState<DateFilterState>(
     getDateFilterRange("thisMonth")
@@ -107,6 +125,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setAccounts([]);
         setCategories([]);
         setTransactions([]);
+        setDebts([]);
         setLoading(false);
         return;
       }
@@ -163,10 +182,25 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           }
         );
 
+        // Listen to Real Debts
+        const debtsRef = collection(firestore, "users", userId, "debts");
+        const qDebts = query(debtsRef, orderBy("dueDate", "asc"));
+        const unSubDebts = onSnapshot(
+          qDebts,
+          (snapshot) => {
+            const dbs = snapshot.docs.map((d) => d.data() as Debt);
+            setDebts(dbs);
+          },
+          (error) => {
+            console.error("Firestore debts listener error:", error);
+          }
+        );
+
         return () => {
           unSubAccounts();
           unSubCategories();
           unSubTransactions();
+          unSubDebts();
         };
       } else {
         // Real Data Mode but in Demo or offline
@@ -179,15 +213,18 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setAccounts(parsed.accounts || []);
             setCategories(parsed.categories || []);
             setTransactions(parsed.transactions || []);
+            setDebts(parsed.debts || []);
           } else {
             setAccounts([]);
             setCategories([]);
             setTransactions([]);
+            setDebts([]);
           }
         } catch (e) {
           setAccounts([]);
           setCategories([]);
           setTransactions([]);
+          setDebts([]);
         } finally {
           setLoading(false);
         }
@@ -196,6 +233,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Local JSON Dummy Data Mode
       try {
         setLoading(true);
+        const initialDebts = ((dummyData as any).debts as Debt[]) || [];
         const dummyStorageKey = "mmt_dummy_data";
         const localData = localStorage.getItem(dummyStorageKey);
         if (localData) {
@@ -203,6 +241,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setAccounts(parsed.accounts || (dummyData.accounts as Account[]));
           setCategories(parsed.categories || (dummyData.categories as Category[]));
           setTransactions(parsed.transactions || (dummyData.transactions as Transaction[]));
+          setDebts(parsed.debts || initialDebts);
         } else {
           const initialAcc = dummyData.accounts as Account[];
           const initialCat = dummyData.categories as Category[];
@@ -210,12 +249,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setAccounts(initialAcc);
           setCategories(initialCat);
           setTransactions(initialTx);
+          setDebts(initialDebts);
           localStorage.setItem(
             dummyStorageKey,
             JSON.stringify({
               accounts: initialAcc,
               categories: initialCat,
               transactions: initialTx,
+              debts: initialDebts,
             })
           );
         }
@@ -228,7 +269,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [user, isDemo, dataSource]);
 
   // Sync to LocalStorage when in Local Dummy mode or offline real mode
-  const persistLocal = (newAcc: Account[], newCat: Category[], newTx: Transaction[]) => {
+  const persistLocal = (
+    newAcc: Account[],
+    newCat: Category[],
+    newTx: Transaction[],
+    newDebts?: Debt[]
+  ) => {
     try {
       const key =
         dataSource === "LOCAL_DUMMY"
@@ -241,6 +287,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           accounts: newAcc,
           categories: newCat,
           transactions: newTx,
+          debts: newDebts !== undefined ? newDebts : debts,
         })
       );
     } catch (e) {
@@ -672,8 +719,127 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     } else {
       setCategories(updated);
-      persistLocal(accounts, updated, transactions);
+      persistLocal(accounts, updated, transactions, debts);
     }
+  };
+
+  // 7. Debt CRUD
+  const addDebt = async (
+    data: Omit<Debt, "id" | "createdAt" | "paidAmount" | "status" | "payments"> & {
+      paidAmount?: number;
+      payments?: DebtPayment[];
+    }
+  ) => {
+    const newId = "debt_" + generateId();
+    const paid = data.paidAmount || 0;
+    const remaining = data.remainingAmount !== undefined ? data.remainingAmount : (data.originalAmount - paid);
+    let status: Debt["status"] = "UNPAID";
+    if (remaining <= 0) {
+      status = "PAID";
+    } else if (paid > 0) {
+      status = "PARTIAL";
+    }
+
+    const newDebt: Debt = {
+      ...data,
+      id: newId,
+      paidAmount: paid,
+      remainingAmount: remaining,
+      status,
+      payments: data.payments || [],
+      createdAt: new Date().toISOString(),
+    };
+
+    const updated = [...debts, newDebt];
+    if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
+      try {
+        const firestore = db as Firestore;
+        await setDoc(doc(firestore, "users", user.uid, "debts", newId), cleanForFirestore(newDebt));
+      } catch (err: any) {
+        console.error("Firestore addDebt error:", err);
+        toast.error("Gagal menyimpan hutang ke Firestore: " + err.message);
+        throw err;
+      }
+    } else {
+      setDebts(updated);
+      persistLocal(accounts, categories, transactions, updated);
+    }
+  };
+
+  const updateDebt = async (id: string, data: Partial<Debt>) => {
+    const updated = debts.map((d) => {
+      if (d.id !== id) return d;
+      const updatedItem = { ...d, ...data, updatedAt: new Date().toISOString() };
+      if (updatedItem.remainingAmount !== undefined && updatedItem.remainingAmount <= 0) {
+        updatedItem.status = "PAID";
+      }
+      return updatedItem;
+    });
+
+    if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
+      try {
+        const firestore = db as Firestore;
+        await updateDoc(
+          doc(firestore, "users", user.uid, "debts", id),
+          cleanForFirestore(data) as Record<string, any>
+        );
+      } catch (err: any) {
+        console.error("Firestore updateDebt error:", err);
+        toast.error("Gagal update data hutang di Firestore: " + err.message);
+        throw err;
+      }
+    } else {
+      setDebts(updated);
+      persistLocal(accounts, categories, transactions, updated);
+    }
+  };
+
+  const deleteDebt = async (id: string) => {
+    const updated = debts.filter((d) => d.id !== id);
+    if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
+      try {
+        const firestore = db as Firestore;
+        await deleteDoc(doc(firestore, "users", user.uid, "debts", id));
+      } catch (err: any) {
+        console.error("Firestore deleteDebt error:", err);
+        toast.error("Gagal menghapus hutang dari Firestore: " + err.message);
+        throw err;
+      }
+    } else {
+      setDebts(updated);
+      persistLocal(accounts, categories, transactions, updated);
+    }
+  };
+
+  // Catat pembayaran hutang: memperbarui sisa hutang & riwayat tanpa memotong saldo dompet (sesuai preferensi pengguna)
+  const recordDebtPayment = async (
+    debtId: string,
+    amount: number,
+    notes?: string,
+    date?: string
+  ) => {
+    const targetDebt = debts.find((d) => d.id === debtId);
+    if (!targetDebt) return;
+
+    const newPayment: DebtPayment = {
+      id: "pay_" + generateId(),
+      date: date || new Date().toISOString().substring(0, 10),
+      amount,
+      notes,
+      createdAt: new Date().toISOString(),
+    };
+
+    const newPaidAmount = (targetDebt.paidAmount || 0) + amount;
+    const newRemainingAmount = Math.max(0, targetDebt.remainingAmount - amount);
+    const newStatus: Debt["status"] = newRemainingAmount <= 0 ? "PAID" : "PARTIAL";
+    const updatedPayments = [...(targetDebt.payments || []), newPayment];
+
+    await updateDebt(debtId, {
+      paidAmount: newPaidAmount,
+      remainingAmount: newRemainingAmount,
+      status: newStatus,
+      payments: updatedPayments,
+    });
   };
 
   // Reset to default Dummy Data from JSON file
@@ -681,17 +847,19 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const initialAcc = dummyData.accounts as Account[];
     const initialCat = dummyData.categories as Category[];
     const initialTx = dummyData.transactions as Transaction[];
+    const initialDebts = ((dummyData as any).debts as Debt[]) || [];
     setAccounts(initialAcc);
     setCategories(initialCat);
     setTransactions(initialTx);
-    persistLocal(initialAcc, initialCat, initialTx);
+    setDebts(initialDebts);
+    persistLocal(initialAcc, initialCat, initialTx, initialDebts);
   };
 
   const resetToDemoData = resetToDefaultJSON;
 
   // Export JSON & CSV
   const exportDataJSON = () => {
-    return JSON.stringify({ accounts, categories, transactions }, null, 2);
+    return JSON.stringify({ accounts, categories, transactions, debts }, null, 2);
   };
 
   const exportDataCSV = () => {
@@ -727,10 +895,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setAccounts(parsed.accounts);
         if (Array.isArray(parsed.categories)) setCategories(parsed.categories);
         setTransactions(parsed.transactions);
+        if (Array.isArray(parsed.debts)) setDebts(parsed.debts);
         persistLocal(
           parsed.accounts,
           parsed.categories || DEFAULT_CATEGORIES,
-          parsed.transactions
+          parsed.transactions,
+          parsed.debts
         );
         return true;
       }
@@ -747,6 +917,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         categories,
         transactions,
         filteredTransactions,
+        debts,
         dateFilter,
         setDateFilter,
         metrics,
@@ -762,6 +933,10 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addCategory,
         updateCategory,
         deleteCategory,
+        addDebt,
+        updateDebt,
+        deleteDebt,
+        recordDebtPayment,
         loadDefaultCategoriesToReal,
         transferFunds,
         resetToDemoData,

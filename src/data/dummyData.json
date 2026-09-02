@@ -421,5 +421,172 @@
       "payments": [],
       "createdAt": "2026-08-25T11:00:00.000Z"
     }
+  ],
+  "bills": [
+    {
+      "id": "bill_kos",
+      "name": "Sewa Kos Bulanan",
+      "amount": 1500000,
+      "dueDay": 5,
+      "frequency": "MONTHLY",
+      "category": "Tempat Tinggal / Kos",
+      "icon": "Home",
+      "color": "#6366F1",
+      "defaultAccountId": "acc_bca",
+      "autoPay": false,
+      "reminderDaysBefore": 3,
+      "notes": "Transfer ke BCA Ibu Kost: 8830129841 a/n Siti Aminah. Konfirmasi via WA setelah bayar.",
+      "paymentHistory": [
+        {
+          "id": "pay_kos_prev",
+          "paidDate": "2026-08-04",
+          "period": "2026-08",
+          "amount": 1500000,
+          "accountId": "acc_bca",
+          "accountName": "Bank BCA",
+          "notes": "Sewa kos Agustus lunas",
+          "createdAt": "2026-08-04T10:00:00.000Z"
+        }
+      ],
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "bill_wifi",
+      "name": "Wifi Biznet / Indihome",
+      "amount": 375000,
+      "dueDay": 15,
+      "frequency": "MONTHLY",
+      "category": "Internet & Wifi",
+      "icon": "Wifi",
+      "color": "#0284C7",
+      "defaultAccountId": "acc_bca",
+      "autoPay": false,
+      "reminderDaysBefore": 3,
+      "notes": "ID Pelanggan Biznet: 1029384756 (Paket 50 Mbps Home).",
+      "paymentHistory": [
+        {
+          "id": "pay_wifi_prev",
+          "paidDate": "2026-08-14",
+          "period": "2026-08",
+          "amount": 375000,
+          "accountId": "acc_bca",
+          "accountName": "Bank BCA",
+          "notes": "Tagihan Wifi Agustus",
+          "createdAt": "2026-08-14T09:30:00.000Z"
+        }
+      ],
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "bill_halo",
+      "name": "Pascabayar Kartu Halo Telkomsel",
+      "amount": 150000,
+      "dueDay": 20,
+      "frequency": "MONTHLY",
+      "category": "Telekomunikasi",
+      "icon": "Smartphone",
+      "color": "#E11D48",
+      "defaultAccountId": "acc_gopay",
+      "autoPay": false,
+      "reminderDaysBefore": 3,
+      "notes": "No Pascabayar: 0811-2345-6789. Paket Halo Unlimited 30GB.",
+      "paymentHistory": [
+        {
+          "id": "pay_halo_prev",
+          "paidDate": "2026-08-19",
+          "period": "2026-08",
+          "amount": 150000,
+          "accountId": "acc_gopay",
+          "accountName": "GoPay",
+          "notes": "Kartu halo Agustus",
+          "createdAt": "2026-08-19T14:15:00.000Z"
+        }
+      ],
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "bill_pln",
+      "name": "Listrik PLN Kamar Kos",
+      "amount": 300000,
+      "dueDay": 10,
+      "frequency": "MONTHLY",
+      "category": "Tagihan & Utilitas",
+      "icon": "Zap",
+      "color": "#F59E0B",
+      "defaultAccountId": "acc_mandiri",
+      "autoPay": false,
+      "reminderDaysBefore": 2,
+      "notes": "No Meter Listrik: 541092837190. Beli via Mandiri Livin.",
+      "paymentHistory": [
+        {
+          "id": "pay_pln_prev",
+          "paidDate": "2026-08-09",
+          "period": "2026-08",
+          "amount": 300000,
+          "accountId": "acc_mandiri",
+          "accountName": "Bank Mandiri",
+          "notes": "Token listrik Agustus",
+          "createdAt": "2026-08-09T08:00:00.000Z"
+        }
+      ],
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "bill_netflix",
+      "name": "Netflix Premium 4K",
+      "amount": 186000,
+      "dueDay": 28,
+      "frequency": "MONTHLY",
+      "category": "Hiburan & Streaming",
+      "icon": "Tv",
+      "color": "#EC4899",
+      "defaultAccountId": "acc_bca",
+      "autoPay": true,
+      "reminderDaysBefore": 2,
+      "notes": "Autodebet kartu debit BCA. Patungan berempat (@Rp 46.500).",
+      "paymentHistory": [
+        {
+          "id": "pay_netflix_prev",
+          "paidDate": "2026-08-28",
+          "period": "2026-08",
+          "amount": 186000,
+          "accountId": "acc_bca",
+          "accountName": "Bank BCA",
+          "notes": "Langganan Netflix Agustus",
+          "createdAt": "2026-08-28T12:00:00.000Z"
+        }
+      ],
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "bill_iuran",
+      "name": "Iuran Kebersihan & Air Kos",
+      "amount": 50000,
+      "dueDay": 1,
+      "frequency": "MONTHLY",
+      "category": "Tagihan & Utilitas",
+      "icon": "Receipt",
+      "color": "#10B981",
+      "defaultAccountId": "acc_cash",
+      "autoPay": false,
+      "reminderDaysBefore": 1,
+      "notes": "Bayar tunai ke penjaga kos Pak Joko awal bulan.",
+      "lastPaidPeriod": "2026-09",
+      "lastPaidDate": "2026-09-01",
+      "paymentHistory": [
+        {
+          "id": "pay_iuran_sep",
+          "paidDate": "2026-09-01",
+          "period": "2026-09",
+          "amount": 50000,
+          "accountId": "acc_cash",
+          "accountName": "Uang Tunai (Dompet)",
+          "notes": "Iuran air & sampah September lunas",
+          "createdAt": "2026-09-01T08:30:00.000Z"
+        }
+      ],
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    }
   ]
 }
+

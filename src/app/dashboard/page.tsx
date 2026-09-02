@@ -10,6 +10,7 @@ import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { CashflowChart } from "@/components/analytics/CashflowChart";
 import { CategoryBreakdownChart } from "@/components/analytics/CategoryBreakdownChart";
 import { FinancialInsights } from "@/components/analytics/FinancialInsights";
+import { DashboardBillsWidget } from "@/components/dashboard/DashboardBillsWidget";
 import { TransactionModal } from "@/components/transactions/TransactionModal";
 import { WalletModal } from "@/components/wallets/WalletModal";
 import {
@@ -102,6 +103,9 @@ export default function DashboardPage() {
 
       {/* Financial Health Insights */}
       <FinancialInsights />
+
+      {/* Monthly Recurring Bills Reminder Widget */}
+      <DashboardBillsWidget />
 
       {/* Recent Transactions List */}
       <RecentTransactions limit={8} />

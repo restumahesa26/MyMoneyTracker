@@ -19,6 +19,7 @@ import {
   LogOut,
   Wallet,
   HandCoins,
+  CalendarClock,
   Eye,
   EyeOff,
 } from "lucide-react";
@@ -38,6 +39,12 @@ export const NAV_ITEMS = [
     href: "/dashboard",
     icon: LayoutDashboard,
     badge: null,
+  },
+  {
+    name: "Tagihan Rutin",
+    href: "/bills",
+    icon: CalendarClock,
+    badge: "Bulanan",
   },
   {
     name: "Analisis Mendalam",

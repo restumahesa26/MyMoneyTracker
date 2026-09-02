@@ -20,6 +20,8 @@ import {
   Transaction,
   Debt,
   DebtPayment,
+  RecurringBill,
+  BillPaymentHistory,
   DateFilterState,
   DashboardMetrics,
   DataSourceMode,
@@ -35,6 +37,7 @@ import {
   endOfDay,
   differenceInDays,
   subDays,
+  format,
 } from "date-fns";
 import { toast } from "sonner";
 
@@ -73,6 +76,26 @@ interface FinanceContextType {
     notes?: string,
     date?: string
   ) => Promise<void>;
+  bills: RecurringBill[];
+  addBill: (
+    data: Omit<RecurringBill, "id" | "createdAt" | "paymentHistory"> & {
+      paymentHistory?: BillPaymentHistory[];
+    }
+  ) => Promise<void>;
+  updateBill: (id: string, data: Partial<RecurringBill>) => Promise<void>;
+  deleteBill: (id: string) => Promise<void>;
+  payBill: (
+    billId: string,
+    payload: {
+      amount: number;
+      period?: string;
+      paidDate?: string;
+      accountId?: string;
+      createTransaction?: boolean;
+      notes?: string;
+    }
+  ) => Promise<void>;
+  unpayBill: (billId: string, period?: string) => Promise<void>;
   loadDefaultCategoriesToReal: () => Promise<void>;
   transferFunds: (
     fromAccountId: string,
@@ -99,6 +122,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
+  const [bills, setBills] = useState<RecurringBill[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [dateFilter, setDateFilter] = useState<DateFilterState>(
     getDateFilterRange("thisMonth")
@@ -159,6 +183,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setCategories([]);
         setTransactions([]);
         setDebts([]);
+        setBills([]);
         setLoading(false);
         return;
       }
@@ -229,11 +254,26 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           }
         );
 
+        // Listen to Real Bills
+        const billsRef = collection(firestore, "users", userId, "bills");
+        const qBills = query(billsRef, orderBy("dueDay", "asc"));
+        const unSubBills = onSnapshot(
+          qBills,
+          (snapshot) => {
+            const bls = snapshot.docs.map((d) => d.data() as RecurringBill);
+            setBills(bls);
+          },
+          (error) => {
+            console.error("Firestore bills listener error:", error);
+          }
+        );
+
         return () => {
           unSubAccounts();
           unSubCategories();
           unSubTransactions();
           unSubDebts();
+          unSubBills();
         };
       } else {
         // Real Data Mode but in Demo or offline
@@ -247,17 +287,26 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setCategories(parsed.categories || []);
             setTransactions(parsed.transactions || []);
             setDebts(parsed.debts || []);
+            setBills(
+              parsed.bills && parsed.bills.length > 0
+                ? parsed.bills
+                : isDemo
+                ? ((dummyData as any).bills as RecurringBill[]) || []
+                : []
+            );
           } else {
-            setAccounts([]);
-            setCategories([]);
-            setTransactions([]);
-            setDebts([]);
+            setAccounts(isDemo ? (dummyData.accounts as Account[]) : []);
+            setCategories(isDemo ? (dummyData.categories as Category[]) : []);
+            setTransactions(isDemo ? (dummyData.transactions as Transaction[]) : []);
+            setDebts(isDemo ? (((dummyData as any).debts as Debt[]) || []) : []);
+            setBills(isDemo ? (((dummyData as any).bills as RecurringBill[]) || []) : []);
           }
         } catch (e) {
           setAccounts([]);
           setCategories([]);
           setTransactions([]);
           setDebts([]);
+          setBills([]);
         } finally {
           setLoading(false);
         }
@@ -267,6 +316,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         setLoading(true);
         const initialDebts = ((dummyData as any).debts as Debt[]) || [];
+        const initialBills = ((dummyData as any).bills as RecurringBill[]) || [];
         const dummyStorageKey = "mmt_dummy_data";
         const localData = localStorage.getItem(dummyStorageKey);
         if (localData) {
@@ -275,6 +325,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setCategories(parsed.categories || (dummyData.categories as Category[]));
           setTransactions(parsed.transactions || (dummyData.transactions as Transaction[]));
           setDebts(parsed.debts || initialDebts);
+          setBills(parsed.bills || initialBills);
         } else {
           const initialAcc = dummyData.accounts as Account[];
           const initialCat = dummyData.categories as Category[];
@@ -283,6 +334,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setCategories(initialCat);
           setTransactions(initialTx);
           setDebts(initialDebts);
+          setBills(initialBills);
           localStorage.setItem(
             dummyStorageKey,
             JSON.stringify({
@@ -290,6 +342,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
               categories: initialCat,
               transactions: initialTx,
               debts: initialDebts,
+              bills: initialBills,
             })
           );
         }
@@ -306,7 +359,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     newAcc: Account[],
     newCat: Category[],
     newTx: Transaction[],
-    newDebts?: Debt[]
+    newDebts?: Debt[],
+    newBills?: RecurringBill[]
   ) => {
     try {
       const key =
@@ -321,6 +375,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           categories: newCat,
           transactions: newTx,
           debts: newDebts !== undefined ? newDebts : debts,
+          bills: newBills !== undefined ? newBills : bills,
         })
       );
     } catch (e) {
@@ -875,24 +930,177 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   };
 
+  // 8. Bills CRUD & Payment
+  const addBill = async (
+    data: Omit<RecurringBill, "id" | "createdAt" | "paymentHistory"> & {
+      paymentHistory?: BillPaymentHistory[];
+    }
+  ) => {
+    const newId = "bill_" + generateId();
+    const newBill: RecurringBill = {
+      ...data,
+      id: newId,
+      frequency: data.frequency || "MONTHLY",
+      paymentHistory: data.paymentHistory || [],
+      createdAt: new Date().toISOString(),
+    };
+
+    const updated = [...bills, newBill];
+    if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
+      try {
+        const firestore = db as Firestore;
+        await setDoc(doc(firestore, "users", user.uid, "bills", newId), cleanForFirestore(newBill));
+      } catch (err: any) {
+        console.error("Firestore addBill error:", err);
+        toast.error("Gagal menyimpan tagihan ke Firestore: " + err.message);
+        throw err;
+      }
+    } else {
+      setBills(updated);
+      persistLocal(accounts, categories, transactions, debts, updated);
+    }
+  };
+
+  const updateBill = async (id: string, data: Partial<RecurringBill>) => {
+    const updated = bills.map((b) =>
+      b.id === id ? { ...b, ...data, updatedAt: new Date().toISOString() } : b
+    );
+
+    if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
+      try {
+        const firestore = db as Firestore;
+        await updateDoc(
+          doc(firestore, "users", user.uid, "bills", id),
+          cleanForFirestore(data) as Record<string, any>
+        );
+      } catch (err: any) {
+        console.error("Firestore updateBill error:", err);
+        toast.error("Gagal update data tagihan di Firestore: " + err.message);
+        throw err;
+      }
+    } else {
+      setBills(updated);
+      persistLocal(accounts, categories, transactions, debts, updated);
+    }
+  };
+
+  const deleteBill = async (id: string) => {
+    const updated = bills.filter((b) => b.id !== id);
+    if (dataSource === "FIREBASE" && !isDemo && isFirebaseConfigured() && db && user) {
+      try {
+        const firestore = db as Firestore;
+        await deleteDoc(doc(firestore, "users", user.uid, "bills", id));
+      } catch (err: any) {
+        console.error("Firestore deleteBill error:", err);
+        toast.error("Gagal menghapus tagihan dari Firestore: " + err.message);
+        throw err;
+      }
+    } else {
+      setBills(updated);
+      persistLocal(accounts, categories, transactions, debts, updated);
+    }
+  };
+
+  const payBill = async (
+    billId: string,
+    payload: {
+      amount: number;
+      period?: string;
+      paidDate?: string;
+      accountId?: string;
+      createTransaction?: boolean;
+      notes?: string;
+    }
+  ) => {
+    const targetBill = bills.find((b) => b.id === billId);
+    if (!targetBill) return;
+
+    const now = new Date();
+    const currentPeriod = payload.period || format(now, "yyyy-MM");
+    const paidDate = payload.paidDate || format(now, "yyyy-MM-dd");
+    const payAccount = accounts.find((a) => a.id === payload.accountId);
+
+    let transactionId: string | undefined;
+
+    if (payload.createTransaction && payload.accountId && payAccount) {
+      const txId = "tx_" + generateId();
+      transactionId = txId;
+      await addTransaction({
+        type: "EXPENSE",
+        amount: payload.amount,
+        date: paidDate + "T12:00:00.000Z",
+        description: `Bayar Tagihan: ${targetBill.name} (${currentPeriod})`,
+        categoryId: "cat_bills",
+        categoryName: "Tagihan & Utilitas (Listrik, Wifi)",
+        categoryIcon: targetBill.icon || "Receipt",
+        categoryColor: targetBill.color || "#EAB308",
+        accountId: payAccount.id,
+        accountName: payAccount.name,
+        accountIcon: payAccount.icon,
+        tags: ["#tagihan", "#" + targetBill.category.toLowerCase().replace(/[^a-z0-9]/g, "-")],
+      });
+    }
+
+    const paymentRecord: BillPaymentHistory = {
+      id: "pay_" + generateId(),
+      paidDate,
+      period: currentPeriod,
+      amount: payload.amount,
+      accountId: payload.accountId,
+      accountName: payAccount?.name,
+      notes: payload.notes,
+      transactionId,
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedPayments = [paymentRecord, ...(targetBill.paymentHistory || [])];
+
+    await updateBill(billId, {
+      lastPaidPeriod: currentPeriod,
+      lastPaidDate: paidDate,
+      paymentHistory: updatedPayments,
+    });
+  };
+
+  const unpayBill = async (billId: string, period?: string) => {
+    const targetBill = bills.find((b) => b.id === billId);
+    if (!targetBill) return;
+
+    const now = new Date();
+    const targetPeriod = period || targetBill.lastPaidPeriod || format(now, "yyyy-MM");
+
+    const remainingHistory = (targetBill.paymentHistory || []).filter(
+      (p) => p.period !== targetPeriod
+    );
+    const prevPayment = remainingHistory[0];
+
+    await updateBill(billId, {
+      lastPaidPeriod: prevPayment ? prevPayment.period : undefined,
+      lastPaidDate: prevPayment ? prevPayment.paidDate : undefined,
+      paymentHistory: remainingHistory,
+    });
+  };
+
   // Reset to default Dummy Data from JSON file
   const resetToDefaultJSON = () => {
     const initialAcc = dummyData.accounts as Account[];
     const initialCat = dummyData.categories as Category[];
     const initialTx = dummyData.transactions as Transaction[];
     const initialDebts = ((dummyData as any).debts as Debt[]) || [];
+    const initialBills = ((dummyData as any).bills as RecurringBill[]) || [];
     setAccounts(initialAcc);
     setCategories(initialCat);
     setTransactions(initialTx);
     setDebts(initialDebts);
-    persistLocal(initialAcc, initialCat, initialTx, initialDebts);
+    setBills(initialBills);
+    persistLocal(initialAcc, initialCat, initialTx, initialDebts, initialBills);
   };
 
   const resetToDemoData = resetToDefaultJSON;
 
   // Export JSON & CSV
   const exportDataJSON = () => {
-    return JSON.stringify({ accounts, categories, transactions, debts }, null, 2);
+    return JSON.stringify({ accounts, categories, transactions, debts, bills }, null, 2);
   };
 
   const exportDataCSV = () => {
@@ -929,11 +1137,13 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (Array.isArray(parsed.categories)) setCategories(parsed.categories);
         setTransactions(parsed.transactions);
         if (Array.isArray(parsed.debts)) setDebts(parsed.debts);
+        if (Array.isArray(parsed.bills)) setBills(parsed.bills);
         persistLocal(
           parsed.accounts,
           parsed.categories || DEFAULT_CATEGORIES,
           parsed.transactions,
-          parsed.debts
+          parsed.debts,
+          parsed.bills
         );
         return true;
       }
@@ -951,6 +1161,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         transactions,
         filteredTransactions,
         debts,
+        bills,
         dateFilter,
         setDateFilter,
         metrics,
@@ -970,6 +1181,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateDebt,
         deleteDebt,
         recordDebtPayment,
+        addBill,
+        updateBill,
+        deleteBill,
+        payBill,
+        unpayBill,
         loadDefaultCategoriesToReal,
         transferFunds,
         resetToDemoData,

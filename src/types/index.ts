@@ -122,3 +122,40 @@ export interface Debt {
   updatedAt?: string;
 }
 
+export type BillFrequency = "MONTHLY" | "YEARLY" | "WEEKLY" | "CUSTOM";
+
+export type BillStatus = "UNPAID" | "PAID" | "OVERDUE" | "DUE_SOON";
+
+export interface BillPaymentHistory {
+  id: string;
+  paidDate: string; // YYYY-MM-DD
+  period: string; // "YYYY-MM", e.g. "2026-09"
+  amount: number;
+  accountId?: string;
+  accountName?: string;
+  notes?: string;
+  transactionId?: string;
+  createdAt: string;
+}
+
+export interface RecurringBill {
+  id: string;
+  name: string; // e.g. "Sewa Kos Bulanan", "Wifi Biznet", "Pascabayar Kartu Halo"
+  amount: number;
+  dueDay: number; // Tanggal jatuh tempo per bulan (1 - 31)
+  frequency: BillFrequency;
+  category: string;
+  icon?: string; // Lucide icon name
+  color?: string; // Hex color code
+  defaultAccountId?: string; // Dompet default
+  autoPay?: boolean;
+  reminderDaysBefore?: number;
+  notes?: string;
+  lastPaidPeriod?: string; // "YYYY-MM" misal "2026-09"
+  lastPaidDate?: string;
+  paymentHistory: BillPaymentHistory[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+

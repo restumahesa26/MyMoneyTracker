@@ -32,5 +32,10 @@ Thumbs.db
 # TypeScript build info
 *.tsbuildinfo
 
-# Note: Environment files (.env, .env.local, .env.example) are intentionally NOT ignored
-# as requested so they can be uploaded/tracked in git.
+# Environment files
+.env*.local
+.env
+.env.production
+.env.development
+!.env.example
+
